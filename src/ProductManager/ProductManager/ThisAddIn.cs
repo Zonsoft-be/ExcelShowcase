@@ -6,17 +6,53 @@ using System.Xml.Linq;
 using Excel = Microsoft.Office.Interop.Excel;
 using Office = Microsoft.Office.Core;
 using Microsoft.Office.Tools.Excel;
+using Microsoft.Office.Core;
+using Application;
+using Allors.Excel.Embedded;
 
 namespace ProductManager
 {
     public partial class ThisAddIn
     {
-        private void ThisAddIn_Startup(object sender, System.EventArgs e)
+        public Ribbon Ribbon { get; set; }
+
+        public AddIn AddIn { get; private set; }
+
+        protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
         {
+            this.Ribbon = new Ribbon();
+
+            return this.Ribbon;
         }
 
-        private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
+        private async void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
+            var office = new OfficeDecorator(this);
+
+            var program = new Program();
+            this.AddIn = new Allors.Excel.Embedded.AddIn(this.Application, program, office);
+
+            this.Ribbon.AddIn = this.AddIn;
+
+            ((Microsoft.Office.Interop.Excel.AppEvents_Event)this.Application).NewWorkbook += ThisAddIn_NewWorkbook;
+
+            await program.OnStart(this.AddIn);
+        }
+
+        private void ThisAddIn_NewWorkbook(Excel.Workbook Wb)
+        {
+            // Do stuff when a new workbook is added.
+        }
+
+        private async void ThisAddIn_Shutdown(object sender, System.EventArgs e)
+        {
+            if (this.AddIn?.Program != null)
+            {
+                await System.Threading.Tasks.Task.Run(async () =>
+                {
+                    await this.AddIn.Program.OnStop();
+                });
+            }
         }
 
         #region VSTO generated code
