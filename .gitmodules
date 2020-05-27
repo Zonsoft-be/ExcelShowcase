@@ -1,0 +1,4 @@
+[submodule "src/ProductManager/allors"]
+	path = src/ProductManager/allors
+	url = https://github.com/Allors/allors2.git
+	branch = master
