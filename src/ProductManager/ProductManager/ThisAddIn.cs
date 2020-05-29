@@ -9,6 +9,7 @@ using Microsoft.Office.Tools.Excel;
 using Microsoft.Office.Core;
 using Application;
 using Allors.Excel.Embedded;
+using ProductManager.Services;
 
 namespace ProductManager
 {
@@ -27,9 +28,12 @@ namespace ProductManager
 
         private async void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
+            var services = new ServiceLocator();
+            
             var office = new OfficeDecorator(this);
 
-            var program = new Program();
+            var program = new Program(services);
+
             this.AddIn = new Allors.Excel.Embedded.AddIn(this.Application, program, office);
 
             this.Ribbon.AddIn = this.AddIn;

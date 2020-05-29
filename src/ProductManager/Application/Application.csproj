@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="Allors.Excel" Version="1.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.4" />
   </ItemGroup>
 
 </Project>

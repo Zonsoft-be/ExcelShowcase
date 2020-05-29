@@ -58,7 +58,7 @@ namespace Application.Sheets
             this.Controls.Static(0, 3, "Price");
 
             var randomQty = new Random(124578);
-            foreach(int index in Enumerable.Range(1, 50000))
+            foreach(int index in Enumerable.Range(1, 100000))
             {
                 this.Controls.Static(index, 0, $"ID_{index}");
                 this.Controls.Static(index, 1, $"Name {index}");

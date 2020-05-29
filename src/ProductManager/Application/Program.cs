@@ -1,4 +1,5 @@
 ﻿using Allors.Excel;
+using Application.Services;
 using Application.Sheets;
 using System;
 using System.Collections.Concurrent;
@@ -12,14 +13,13 @@ namespace Application
     public class Program : IProgram
     {
 
-        public Program()
+        public Program(IServiceLocator services)
         {
+            this.Services = services;
             this.BookByWorkbook = new ConcurrentDictionary<IWorkbook, IBook>();
             this.SheetByWorksheet = new ConcurrentDictionary<IWorksheet, ISheet>();
         }
-
-       
-
+        
         public IAddIn AddIn { get; private set; }
 
         public ConcurrentDictionary<Guid, IWorkbook> Workbooks { get; } = new ConcurrentDictionary<Guid, IWorkbook>();
@@ -31,6 +31,8 @@ namespace Application
         public IWorksheet ActiveWorksheet => this.ActiveWorkbook.Worksheets.FirstOrDefault(v => v.IsActive);
 
         public IDictionary<IWorksheet, ISheet> SheetByWorksheet { get; private set; }
+
+        public IServiceLocator Services { get; }
 
         public IDictionary<IWorkbook, IBook> BookByWorkbook { get; private set; }
 
@@ -77,13 +79,50 @@ namespace Application
             switch (handle)
             {
                 case "AddProductSheet":
+                    {
+                        var ws = this.ActiveWorkbook.Worksheets.FirstOrDefault(v => string.Equals(v.Name, "Products", StringComparison.OrdinalIgnoreCase));
 
-                    var ws = this.ActiveWorkbook.AddWorksheet();
-                    ws.Name = "Product Sheet";
-                    var productSheet = new ProductSheet(this, ws);
-                    this.SheetByWorksheet.Add(ws, productSheet);
+                        ProductSheet sheet = null;
 
-                    await productSheet.Refresh().ConfigureAwait(false);
+                        if (ws == null)
+                        {
+                            ws = this.ActiveWorkbook.AddWorksheet(0);
+                            ws.Name = "Products";
+                            sheet = new ProductSheet(this, ws);
+                            this.SheetByWorksheet.Add(ws, sheet);
+                        }
+                        else
+                        {
+                            sheet = (ProductSheet) this.SheetByWorksheet[ws];
+                        }
+
+                        await sheet.Refresh().ConfigureAwait(false);
+
+                        ws.IsActive = true;
+                    }                   
+
+                    break;
+
+                case "ListCovid19Sheet":
+                    {
+                        var ws = this.ActiveWorkbook.Worksheets.FirstOrDefault(v => string.Equals(v.Name, "Covid19", StringComparison.OrdinalIgnoreCase));
+                        Covid19Sheet sheet = null;
+                        if (ws == null)
+                        {                            
+                            ws = this.ActiveWorkbook.AddWorksheet();
+                            ws.Name = "Covid19";
+                            sheet = new Covid19Sheet(this, ws);
+                            this.SheetByWorksheet.Add(ws, sheet);
+                        }
+                        else
+                        {
+                            sheet = (Covid19Sheet) this.SheetByWorksheet[ws];
+                        }
+
+                        await sheet.Refresh().ConfigureAwait(false);
+
+                        ws.IsActive = true;
+                    }                   
 
                     break;
 

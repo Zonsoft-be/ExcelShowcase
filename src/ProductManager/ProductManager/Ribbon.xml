@@ -5,6 +5,7 @@
       <tab id="tabExcelShowCase" label="ACME Products">
         <group id="MainMenu" label="Menu">
           <button id="AddProductSheet" onAction="OnClick"  label="Add Product Sheet" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>
+          <button id="ListCovid19Sheet" onAction="OnClick"  label="Covid 19" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>
         </group>
       </tab>
     </tabs>
