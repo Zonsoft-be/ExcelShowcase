@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Text;
+using System.Windows.Forms.VisualStyles;
 using Office = Microsoft.Office.Core;
 
 // TODO:  Follow these steps to enable the Ribbon (XML) item:
@@ -45,6 +47,27 @@ namespace ProductManager
             if (this.AddIn != null)
             {
                 await this.AddIn.Program.OnHandle(control.Id);
+
+                this.Invalidate();
+            }
+        }
+
+        /// <summary>
+        /// Invalidate will have excel call the GetEnabled handler. Either for all controls, or for the controls you pass as a parameter
+        /// </summary>
+        /// <param name="controlIds"></param>
+        public void Invalidate(params string[] controlIds)
+        {
+            if(!controlIds.Any())
+            {
+                this.ribbon.Invalidate();
+            }
+            else
+            {
+                foreach (var controlId in controlIds)
+                {
+                    this.ribbon.InvalidateControl(controlId);
+                }
             }
         }
 

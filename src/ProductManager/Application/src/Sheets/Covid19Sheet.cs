@@ -68,9 +68,11 @@ namespace Application.Sheets
             this.Controls.Static(0, columnIndex++, "Confirmed");
             this.Controls.Static(0, columnIndex++, "Recoverd");
             this.Controls.Static(0, columnIndex++, "Critical");
+            this.Controls.Static(0, columnIndex++, "Today Confirmed");
+            this.Controls.Static(0, columnIndex++, "Today Deaths");
 
             var row = 1;
-            foreach (var data in Data.data)
+            foreach (var data in Data.data.OrderBy(v => v.name))
             {
                 columnIndex = 0;
                 this.Controls.Static(row, columnIndex++, data.code);
@@ -81,6 +83,8 @@ namespace Application.Sheets
                 this.Controls.Static(row, columnIndex++, data.latest_data.confirmed);
                 this.Controls.Static(row, columnIndex++, data.latest_data.recovered);
                 this.Controls.Static(row, columnIndex++, data.latest_data.critical);
+                this.Controls.Static(row, columnIndex++, data.today.confirmed);
+                this.Controls.Static(row, columnIndex++, data.today.deaths);
 
                 row++;
             }

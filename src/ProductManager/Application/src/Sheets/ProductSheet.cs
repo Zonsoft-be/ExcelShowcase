@@ -63,7 +63,8 @@ namespace Application.Sheets
                 this.Controls.Static(index, 0, $"ID_{index}");
                 this.Controls.Static(index, 1, $"Name {index}");
                 this.Controls.Static(index, 2, randomQty.Next(10000));
-                this.Controls.Static(index, 3, new decimal(randomQty.Next(0, 1000)));
+                var icell = this.Controls.Static(index, 3, new decimal(randomQty.Next(0, 1000) * randomQty.NextDouble()));
+                icell.NumberFormat = "##0.00";
             }
 
             this.Controls.Bind();

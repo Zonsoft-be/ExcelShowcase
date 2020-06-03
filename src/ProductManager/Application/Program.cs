@@ -47,6 +47,19 @@ namespace Application
             if (this.AddIn == null)
             {
                 return false;
+            }           
+
+            if(controlId == "InsertPicture")
+            {
+                if(this.ActiveWorksheet == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    this.SheetByWorksheet.TryGetValue(this.ActiveWorksheet, out var isheet);
+                    return isheet is DemoSheet;
+                }               
             }
 
             return true;
@@ -80,53 +93,81 @@ namespace Application
             {
                 case "AddProductSheet":
                     {
-                        var ws = this.ActiveWorkbook.Worksheets.FirstOrDefault(v => string.Equals(v.Name, "Products", StringComparison.OrdinalIgnoreCase));
+                        var kvp = this.SheetByWorksheet.FirstOrDefault(v => Equals(v.Key.Workbook, this.ActiveWorkbook) && v.Value is ProductSheet);
+                        
+                        ProductSheet productSheet;
 
-                        ProductSheet sheet = null;
-
-                        if (ws == null)
-                        {
-                            ws = this.ActiveWorkbook.AddWorksheet(0);
-                            ws.Name = "Products";
-                            sheet = new ProductSheet(this, ws);
-                            this.SheetByWorksheet.Add(ws, sheet);
+                        if (kvp.Value == null)
+                        {                      
+                            var iWorksheet = this.ActiveWorkbook.AddWorksheet(0);
+                            iWorksheet.Name = "Products";
+                            productSheet = new ProductSheet(this, iWorksheet);
+                            this.SheetByWorksheet.Add(iWorksheet, productSheet);
                         }
                         else
                         {
-                            sheet = (ProductSheet) this.SheetByWorksheet[ws];
+                            productSheet = (ProductSheet) this.SheetByWorksheet[kvp.Key];
                         }
 
-                        await sheet.Refresh().ConfigureAwait(false);
+                        await productSheet.Refresh().ConfigureAwait(false);
 
-                        ws.IsActive = true;
+                        productSheet.Sheet.IsActive = true;
                     }                   
 
                     break;
 
                 case "ListCovid19Sheet":
                     {
-                        var ws = this.ActiveWorkbook.Worksheets.FirstOrDefault(v => string.Equals(v.Name, "Covid19", StringComparison.OrdinalIgnoreCase));
-                        Covid19Sheet sheet = null;
-                        if (ws == null)
+                        var kvp = this.SheetByWorksheet.FirstOrDefault(v => Equals(v.Key.Workbook, this.ActiveWorkbook) && v.Value is Covid19Sheet);
+
+                        Covid19Sheet covid19Sheet = null;
+                        if (kvp.Value == null)
                         {                            
-                            ws = this.ActiveWorkbook.AddWorksheet();
+                            var ws = this.ActiveWorkbook.AddWorksheet(0);
                             ws.Name = "Covid19";
-                            sheet = new Covid19Sheet(this, ws);
-                            this.SheetByWorksheet.Add(ws, sheet);
+                            covid19Sheet = new Covid19Sheet(this, ws);
+                            this.SheetByWorksheet.Add(ws, covid19Sheet);
                         }
                         else
                         {
-                            sheet = (Covid19Sheet) this.SheetByWorksheet[ws];
+                            covid19Sheet = (Covid19Sheet) this.SheetByWorksheet[kvp.Key];
                         }
 
-                        await sheet.Refresh().ConfigureAwait(false);
+                        await covid19Sheet.Refresh().ConfigureAwait(false);
 
-                        ws.IsActive = true;
+                        covid19Sheet.Sheet.IsActive = true;
                     }                   
 
                     break;
 
-            }            
+                case "AddDemoSheet":
+                    {
+                        var wsCount = this.SheetByWorksheet.Count(v => Equals(v.Key.Workbook, this.ActiveWorkbook) && v.Value is DemoSheet);
+
+                        var iWorksheet = this.ActiveWorkbook.AddWorksheet(0);
+                        iWorksheet.Name = $"Demo {wsCount}";
+                        var demoSheet = new DemoSheet(this, iWorksheet);
+                        this.SheetByWorksheet.Add(iWorksheet, demoSheet);
+
+                        await demoSheet.Refresh().ConfigureAwait(false);
+
+                        iWorksheet.IsActive = true;
+                    }
+                    break;
+
+                case "InsertPicture":
+                    {
+                        if(this.SheetByWorksheet.TryGetValue(this.ActiveWorksheet, out var iSheet))
+                        {
+                            if(iSheet is DemoSheet demoSheet)
+                            {
+                                demoSheet.InsertPicture();
+                            }
+                        }                        
+                    }
+                    break;
+
+            }          
         }
 
         public async Task OnLogin()

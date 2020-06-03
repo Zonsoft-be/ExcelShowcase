@@ -40,7 +40,14 @@ namespace ProductManager
 
             ((Microsoft.Office.Interop.Excel.AppEvents_Event)this.Application).NewWorkbook += ThisAddIn_NewWorkbook;
 
+            ((Microsoft.Office.Interop.Excel.AppEvents_Event)this.Application).SheetActivate += ThisAddIn_SheetActivate;
+
             await program.OnStart(this.AddIn);
+        }
+
+        private void ThisAddIn_SheetActivate(object Sh)
+        {
+            this.Ribbon.Invalidate();
         }
 
         private void ThisAddIn_NewWorkbook(Excel.Workbook Wb)

@@ -75,10 +75,10 @@ namespace Application.Ui
         /// <param name="row"></param>
         /// <param name="column"></param>
         /// <param name="value"></param>
-        internal void Static<T>(int row, int column, T value)
+        internal ICell Static<T>(int row, int column, T value)
         {
             var cell = this.Worksheet[row, column];
-
+            
             if (!this.ControlByCell.TryGetValue(cell, out var control))
             {
                 control = new StaticContent<T>(cell);
@@ -89,6 +89,8 @@ namespace Application.Ui
             staticContent.Value = value;
 
             this.ActiveControls.Add(staticContent);
+
+            return cell;
         }
               
 
@@ -97,7 +99,7 @@ namespace Application.Ui
         /// </summary>
         /// <param name="cell"></param>
         /// <param name="formula"></param>
-        internal void Formula(int row, int column, string formula)
+        internal ICell Formula(int row, int column, string formula)
         {
             var cell = this.Worksheet[row, column];
 
@@ -111,6 +113,8 @@ namespace Application.Ui
             formulaControl.Formula = formula;
 
             this.ActiveControls.Add(formulaControl);
+
+            return cell;
         }
                
 
