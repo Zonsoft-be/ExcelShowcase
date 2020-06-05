@@ -1,0 +1,1 @@
+export { SearchFactory } from './SearchFactory';

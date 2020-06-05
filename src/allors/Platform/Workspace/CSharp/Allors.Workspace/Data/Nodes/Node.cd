@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Allors.Workspace.Data.Node">
+    <Position X="1.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIgAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAACBAAAAAA=</HashCode>
+      <FileName>Data\Nodes\Tree.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="Allors.Workspace.Data.INode">
+    <Position X="1.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>Data\Nodes\INode.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Nodes" />
+      <Property Name="PropertyType" />
+    </ShowAsAssociation>
+  </Interface>
+  <Interface Name="Allors.Workspace.Meta.IPropertyType" Collapsed="true">
+    <Position X="5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAiAAAAAAAAAIAAAAAAAQAAAAAAAACAIAAAAAAAAA=</HashCode>
+      <FileName>Meta\IPropertyType.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

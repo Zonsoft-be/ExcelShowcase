@@ -1,0 +1,61 @@
+<form *ngIf="orderItem" #form="ngForm" (submit)="save()">
+
+  <h3 mat-dialog-title>{{title}}</h3>
+
+  <mat-dialog-content>
+    <div class="row" *ngIf="!orderItem.isNew">
+      <a-mat-static class="col-md" [object]="orderItem" [roleType]="m.PurchaseOrderItem.PurchaseOrderItemState"
+        display="Name" label="Status"></a-mat-static>
+      <a-mat-static class="col-md" [object]="orderItem" [roleType]="m.PurchaseOrderItem.PurchaseOrderItemShipmentState"
+        display="Name" label="Shipment Status"></a-mat-static>
+      <a-mat-static class="col-md" [object]="orderItem" [roleType]="m.PurchaseOrderItem.PurchaseOrderItemPaymentState"
+        display="Name" label="Payment Status"></a-mat-static>
+    </div>
+
+    <div class="row">
+      <a-mat-textarea class="col-md-12" [object]="orderItem" [roleType]="m.PurchaseOrderItem.Description">
+      </a-mat-textarea>
+    </div>
+
+    <div class="row">
+      <a-mat-autocomplete class="col-md" *ngIf="!nonUnifiedPart" [object]="orderItem"
+        [roleType]="m.PurchaseOrderItem.Part" display="Name" (changed)="partSelected($event)"
+        [filter]="filtersService.goodsFilter.create(allors.context)" label="Product"></a-mat-autocomplete>
+      <a-mat-autocomplete *ngIf="!unifiedGood" class="col-md"  [object]="orderItem"
+        [roleType]="m.PurchaseOrderItem.Part" display="DisplayName" (changed)="sparePartSelected($event)"
+        [filter]="sparePartsFilter.create(allors.context)" label="Spare Part"></a-mat-autocomplete>
+    </div>
+
+    <div *ngIf="unifiedGood" class="row">
+      <a-mat-select class="col-md" [disabled]="!serialised" [object]="orderItem" (changed)="partSelected($event)"
+        [roleType]="m.PurchaseOrderItem.SerialisedItem" [options]="serialisedItems" display="displayName">
+      </a-mat-select>
+      <a-mat-input class="col-md" [disabled]="!serialised || orderItem.SerialisedItem" [object]="orderItem"
+        [roleType]="m.PurchaseOrderItem.SerialNumber"></a-mat-input>
+    </div>
+
+    <div class="row">
+      <a-mat-input class="col-md" [object]="orderItem" [roleType]="m.PurchaseOrderItem.QuantityOrdered"></a-mat-input>
+      <a-mat-static *ngIf="orderItem.Part" class="col-md" [object]="supplierOffering"
+        [roleType]="m.SupplierOffering.Price" label="Supplier Price"></a-mat-static>
+      <a-mat-input class="col-md" [object]="orderItem" [roleType]="m.PurchaseOrderItem.AssignedUnitPrice"
+        label="Agreed on Price"></a-mat-input>
+    </div>
+
+    <div class="row">
+      <a-mat-textarea class="col-md-12" [object]="orderItem" [roleType]="m.PurchaseOrderItem.Comment"
+        label="Order Item Comment"></a-mat-textarea>
+      <a-mat-textarea class="col-md-12" [object]="orderItem" [roleType]="m.PurchaseOrderItem.InternalComment"
+        label="Order Item Internal Comment"></a-mat-textarea>
+    </div>
+
+  </mat-dialog-content>
+
+  <div mat-dialog-actions>
+    <button mat-button class="ml-2" color="primary" type="submit"
+      [disabled]="!form.form.valid || !allors.context.hasChanges ">SAVE & CLOSE</button>
+    <button mat-button (click)="update()" type="button" color="accent" [disabled]="!form.form.valid">SAVE</button>
+    <button mat-button (click)="dialogRef.close()" type="button">CANCEL</button>
+  </div>
+
+</form>

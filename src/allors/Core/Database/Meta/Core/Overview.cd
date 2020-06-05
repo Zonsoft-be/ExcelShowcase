@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Allors.Meta.MetaObject" Collapsed="true">
+    <Position X="4.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAIABAAIAAAAkAAAQAQAAAAAIIAAA=</HashCode>
+      <FileName>generated\interfaces.g.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Allors.Meta.MetaPopulation" Collapsed="true">
+    <Position X="1" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AINAgAAAQAHCBIABqBgAVDiA0AAaAEAg3MRB4AnCDMg=</HashCode>
+      <FileName>Core\Meta\MetaPopulation.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Meta.Domain" Collapsed="true">
+    <Position X="3.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAghQAAAACAAAQEAACAAAQIAAAEAAAAAQAEAAAAAAA=</HashCode>
+      <FileName>Core\Meta\Domain.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Meta.DomainObject" Collapsed="true">
+    <Position X="6" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Meta\DomainObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Allors.Meta.Inheritance" Collapsed="true">
+    <Position X="2.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAAACAAAAEAACAAAAAAAAAAAAAEAAAABAQAAA=</HashCode>
+      <FileName>Core\Meta\Inheritance.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Allors.Meta.MethodType" Collapsed="true">
+    <Position X="10.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEACAAADAAIAEQACAAAQAAAAUAAAQAIAAAAAAAAA=</HashCode>
+      <FileName>Core\Meta\MethodType.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Meta.ObjectType" Collapsed="true">
+    <Position X="5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAAgCAAAYEAACAAAQBACKAAAACAAAAAUAAAAA=</HashCode>
+      <FileName>Core\Meta\ObjectType.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Meta.PropertyType" Collapsed="true">
+    <Position X="8.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAABAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Meta\PropertyType.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Allors.Meta.RelationType" Collapsed="true">
+    <Position X="7.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACIAEAABABDAASQWQKCIBAQgiAAQABBQEAIAAAAAQAA=</HashCode>
+      <FileName>Core\Meta\RelationType.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Meta.AssociationType" Collapsed="true">
+    <Position X="7.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIGmACAAADAAIZEAECAAAQAAIEAAAASBZIIAABAAAA=</HashCode>
+      <FileName>Core\Meta\AssociationType.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Meta.RoleType" Collapsed="true">
+    <Position X="9.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAGmBCAAgDAhIZEgMLABAQigAIAAAASAZIQAADAEAA=</HashCode>
+      <FileName>Core\Meta\RoleType.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Meta.Composite" Collapsed="true">
+    <Position X="2.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BoJQkaQAJFFkBJARGSQZB4QEwQEQGApSwVBAEAgAQEE=</HashCode>
+      <FileName>Core\Meta\Composite.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Meta.Unit" Collapsed="true">
+    <Position X="5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIgIAAAACAAABIgAAAQAABAAAAAAIQAAAAAQAAAAA=</HashCode>
+      <FileName>Core\Meta\Unit.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Meta.Class" Collapsed="true">
+    <Position X="1.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABBAgIAEAAHEAAABABAQQAAAAEAAAAgGAAACAIAAQAA=</HashCode>
+      <FileName>Core\Meta\Class.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Meta.Interface" Collapsed="true">
+    <Position X="4" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAkIEAAEHAAAABBEAQAAgAAAAAAAgAAAKIFAIAQgE=</HashCode>
+      <FileName>Core\Meta\Interface.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Allors.Meta.OperandType" Collapsed="true">
+    <Position X="9.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Meta\OperandType.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
