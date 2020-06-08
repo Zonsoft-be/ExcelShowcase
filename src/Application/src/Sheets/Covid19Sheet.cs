@@ -71,6 +71,9 @@ namespace Application.Sheets
             this.Controls.Static(0, columnIndex++, "Today Confirmed");
             this.Controls.Static(0, columnIndex++, "Today Deaths");
 
+            // Freeze topRow
+            this.Sheet.FreezePanes(new Range(0, -1, 0,0));
+
             var row = 1;
             foreach (var data in Data.data.OrderBy(v => v.name))
             {

@@ -1,4 +1,5 @@
 ﻿using Allors.Excel;
+using Application.Models;
 using Application.Ui;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Application.Sheets
 {
@@ -39,7 +41,7 @@ namespace Application.Sheets
                 this.IsWorksheetUpToDate = true;
             }
         }
-
+        
         private async void Binder_ToDomained(object sender, EventArgs e)
         {
             await this.Sheet.Flush().ConfigureAwait(false);
@@ -49,24 +51,47 @@ namespace Application.Sheets
 
         private Controls Controls { get; }
 
+        public Product[] Products { get; set; } 
+
         public async Task Refresh()
         {
+            this.Products = this.program.Services.Database.Get<Product>();
+
             //
             this.Controls.Static(0, 0, "Product ID");
             this.Controls.Static(0, 1, "Name");
             this.Controls.Static(0, 2, "Qty");
-            this.Controls.Static(0, 3, "Price");
+            this.Controls.Static(0, 3, "Price/Unit");
+            this.Controls.Static(0, 4, "Unit");
 
-            var randomQty = new Random(124578);
-            foreach(int index in Enumerable.Range(1, 100000))
+            this.Sheet.FreezePanes(new Range(0, -1, 0, 0));
+
+            var rowIndex = 1;
+                       
+            foreach (var product in this.Products)
             {
-                this.Controls.Static(index, 0, $"ID_{index}");
-                this.Controls.Static(index, 1, $"Name {index}");
-                this.Controls.Static(index, 2, randomQty.Next(10000));
-                var icell = this.Controls.Static(index, 3, new decimal(randomQty.Next(0, 1000) * randomQty.NextDouble()));
+                this.Controls.Static(rowIndex, 0, product.Id.ToString());
+                this.Controls.Static(rowIndex, 1, product.Name);                        
+                this.Controls.Static(rowIndex, 2, product.Quantity);
+                var icell = this.Controls.Static(rowIndex, 3, product.UnitPrice);
                 icell.NumberFormat = "##0.00";
+
+                this.Controls.Static(rowIndex, 4, product.Unit);
+
+                rowIndex++;
             }
 
+            {
+                rowIndex++;
+
+                var icell = this.Controls.Static(rowIndex, 2, this.Products.Sum(v => v.Quantity ));
+                icell.Comment = "Total Quantity";
+
+                icell = this.Controls.Static(rowIndex, 3, this.Products.Average(v => v.UnitPrice));
+                icell.Comment = "Average Price";
+            }        
+           
+           
             this.Controls.Bind();
 
             await this.Sheet.Flush().ConfigureAwait(false);

@@ -52,6 +52,39 @@ namespace ProductManager
             }
         }
 
+        public async void AddInvoiceSheet(Office.IRibbonControl control)
+        {
+            if (this.AddIn != null)
+            {
+                // First, add a new Sheet based on a template, and then continue
+                string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+                string fileName = Path.Combine(path, "Custom Office Templates", "ShowCaseTemplates.xltx");
+
+                var templateFile = new FileInfo(fileName);
+
+                if (templateFile.Exists)
+                {
+                    var targetWorkbook = this.AddIn.Application.ActiveWorkbook;
+                    var index = targetWorkbook.Sheets.Count;
+
+                    var template = this.AddIn.Application.Workbooks.Open(templateFile.FullName);
+                    var invoiceTemplate = (Microsoft.Office.Interop.Excel.Worksheet)template.Worksheets[1];
+                    invoiceTemplate.Copy(After: targetWorkbook.Sheets[index]);
+                    template.Close(SaveChanges: false);
+
+                    var copied = (Microsoft.Office.Interop.Excel.Worksheet)targetWorkbook.Sheets[index + 1];
+                                        
+                    var wb = this.AddIn.WorkbookByInteropWorkbook[targetWorkbook];
+                    wb.New(copied);
+                }
+
+                await this.AddIn.Program.OnHandle(control.Id);
+
+                this.Invalidate();
+            }
+        }
+
         /// <summary>
         /// Invalidate will have excel call the GetEnabled handler. Either for all controls, or for the controls you pass as a parameter
         /// </summary>

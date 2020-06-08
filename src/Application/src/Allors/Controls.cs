@@ -12,6 +12,7 @@ namespace Application.Ui
     using Allors.Excel;
     using System.Globalization;
     using System.Drawing;
+    using Application.Models;
 
     public class Controls
     {
@@ -116,7 +117,7 @@ namespace Application.Ui
 
             return cell;
         }
-               
+
 
         ///// <summary>
         ///// Sets a readonly value in the cell. Changes are not handled.
@@ -125,26 +126,30 @@ namespace Application.Ui
         ///// <param name="sessionObject"></param>
         ///// <param name="roleType"></param>
         ///// <param name="relationType"></param>
-        //internal void Label(int row, int column, ISessionObject sessionObject, RoleType roleType, RoleType relationType = null)
-        //{
-        //    if (sessionObject != null)
-        //    {
-        //        var cell = this.Worksheet[row, column];
+        internal ICell Label<T>(int row, int column, T sessionObject, string roleType, string relationType = null) where T : Identifiable
+        {
+            if (sessionObject != null)
+            {
+                var cell = this.Worksheet[row, column];
 
-        //        if (!this.ControlByCell.TryGetValue(cell, out var control))
-        //        {
-        //            control = new Label(cell);
-        //            this.ControlByCell.TryAdd(cell, control);
-        //        }
+                if (!this.ControlByCell.TryGetValue(cell, out var control))
+                {
+                    control = new Label<T>(cell);
+                    this.ControlByCell.TryAdd(cell, control);
+                }
 
-        //        var label = (Label)control;
-        //        label.SessionObject = sessionObject;
-        //        label.RoleType = roleType;
-        //        label.RelationType = relationType;
+                var label = (Label<T>)control;
+                label.SessionObject = sessionObject;
+                label.RoleType = roleType;
+               
 
-        //        this.ActiveControls.Add(control);
-        //    }
-        //}
+                this.ActiveControls.Add(control);
+
+                return cell;
+            }
+
+            return null;
+        }
 
         ///// <inheritdoc cref="Application.Excel.TextBox"/>
         //internal void TextBox(
@@ -198,7 +203,7 @@ namespace Application.Ui
         //            control = new ComboBox(cell);
         //            this.ControlByCell.TryAdd(cell, control);
         //        }
-                
+
         //        var comboBox = (ComboBox)control;
 
         //        comboBox.SessionObject = sessionObject;
@@ -206,7 +211,7 @@ namespace Application.Ui
         //        comboBox.RelationType = relationType;
         //        comboBox.DisplayRoleType = displayRoleType;
         //        comboBox.ToDomain = getRelation;
-               
+
         //        this.ActiveControls.Add(control);
         //    }
         //}

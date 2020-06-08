@@ -11,6 +11,11 @@
           <button id="AddDemoSheet" onAction="OnClick"  label="Add Demo Sheet" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>
           <button id="InsertPicture" onAction="OnClick"  label="Insert Image" imageMso="PictureInsertFromFile" size="large" getEnabled="GetEnabled"/>
         </group>
+        <group id="Templates" label="Templates">
+          <button id="AddInvoiceSheet" onAction="AddInvoiceSheet" label="Add Invoice Sheet" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>
+          <button id="SaveInvoiceSheet" onAction="OnClick" label="Save" imageMso="FileSave" size="large"  getEnabled="GetEnabled"/>
+          <button id="PrintInvoiceSheet" onAction="OnClick" label="Print" imageMso="FilePrint" size="large"  getEnabled="GetEnabled"/>
+        </group>
       </tab>
     </tabs>
   </ribbon>

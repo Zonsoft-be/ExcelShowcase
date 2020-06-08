@@ -62,6 +62,19 @@ namespace Application
                 }               
             }
 
+            if (controlId == "PrintInvoiceSheet")
+            {
+                if (this.ActiveWorksheet == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    this.SheetByWorksheet.TryGetValue(this.ActiveWorksheet, out var isheet);
+                    return isheet is InvoiceSheet;
+                }
+            }
+
             return true;
         }
 
@@ -108,7 +121,7 @@ namespace Application
                         {
                             productSheet = (ProductSheet) this.SheetByWorksheet[kvp.Key];
                         }
-
+                                              
                         await productSheet.Refresh().ConfigureAwait(false);
 
                         productSheet.Sheet.IsActive = true;
@@ -155,6 +168,21 @@ namespace Application
                     }
                     break;
 
+                case "AddInvoiceSheet":
+                    {
+                        var wsCount = this.SheetByWorksheet.Count(v => Equals(v.Key.Workbook, this.ActiveWorkbook) && v.Value is InvoiceSheet);
+
+                        var iWorksheet = this.ActiveWorksheet;
+                        iWorksheet.Name = $"Invoice {wsCount}";
+                        var invoiceSheet = new InvoiceSheet(this, iWorksheet);
+                        this.SheetByWorksheet.Add(iWorksheet, invoiceSheet);
+
+                        await invoiceSheet.Refresh().ConfigureAwait(false);
+
+                        invoiceSheet.Sheet.IsActive = true;
+                    }
+                    break;
+
                 case "InsertPicture":
                     {
                         if(this.SheetByWorksheet.TryGetValue(this.ActiveWorksheet, out var iSheet))
@@ -167,7 +195,32 @@ namespace Application
                     }
                     break;
 
-            }          
+                case "SaveInvoiceSheet":
+                    {
+                        if (this.SheetByWorksheet.TryGetValue(this.ActiveWorksheet, out var iSheet))
+                        {
+                            if (iSheet is InvoiceSheet invoiceSheet)
+                            {
+                                await invoiceSheet.Save();
+                            }
+                        }
+                    }
+                    break;
+
+                case "PrintInvoiceSheet":
+                    {
+                        if (this.SheetByWorksheet.TryGetValue(this.ActiveWorksheet, out var iSheet))
+                        {
+                            if (iSheet is InvoiceSheet invoiceSheet)
+                            {
+                                invoiceSheet.SaveAsPDF();
+                            }
+                        }
+                    }
+                    break;
+
+
+            }
         }
 
         public async Task OnLogin()
