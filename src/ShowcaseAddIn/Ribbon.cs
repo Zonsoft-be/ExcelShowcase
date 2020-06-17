@@ -1,4 +1,5 @@
-﻿using Allors.Excel.Embedded;
+﻿using Application;
+using ProductManager.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -40,7 +41,8 @@ namespace ProductManager
         {
         }
 
-        public AddIn AddIn { get; set; }
+        public Allors.Excel.Interop.AddIn AddIn { get; set; }
+        public ServiceLocator Services { get; internal set; }
 
         public async void OnClick(Office.IRibbonControl control)
         {
@@ -56,10 +58,7 @@ namespace ProductManager
         {
             if (this.AddIn != null)
             {
-                // First, add a new Sheet based on a template, and then continue
-                string path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
-                string fileName = Path.Combine(path, "Custom Office Templates", "ShowCaseTemplates.xltx");
+                string fileName = this.Services.Configuration["TemplateFile"];
 
                 var templateFile = new FileInfo(fileName);
 
@@ -73,8 +72,8 @@ namespace ProductManager
                     invoiceTemplate.Copy(After: targetWorkbook.Sheets[index]);
                     template.Close(SaveChanges: false);
 
-                    var copied = (Microsoft.Office.Interop.Excel.Worksheet)targetWorkbook.Sheets[index + 1];
-                                        
+                    var copied = (Microsoft.Office.Interop.Excel.Worksheet)targetWorkbook.Sheets[index + 1];                                       
+                    
                     var wb = this.AddIn.WorkbookByInteropWorkbook[targetWorkbook];
                     wb.New(copied);
                 }

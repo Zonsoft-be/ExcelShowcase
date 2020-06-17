@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
 using Excel = Microsoft.Office.Interop.Excel;
-using Office = Microsoft.Office.Core;
-using Microsoft.Office.Tools.Excel;
 using Microsoft.Office.Core;
 using Application;
-using Allors.Excel.Embedded;
 using ProductManager.Services;
+using Allors.Excel.Interop;
+using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
+using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
+using System.Linq;
+using Application.Sheets;
 
 namespace ProductManager
 {
@@ -17,7 +15,7 @@ namespace ProductManager
     {
         public Ribbon Ribbon { get; set; }
 
-        public AddIn AddIn { get; private set; }
+        public Allors.Excel.Interop.AddIn AddIn { get; private set; }
 
         protected override IRibbonExtensibility CreateRibbonExtensibilityObject()
         {
@@ -34,15 +32,70 @@ namespace ProductManager
 
             var program = new Program(services);
 
-            this.AddIn = new Allors.Excel.Embedded.AddIn(this.Application, program, office);
+            this.AddIn = new Allors.Excel.Interop.AddIn(this.Application, program, office);
 
             this.Ribbon.AddIn = this.AddIn;
+            this.Ribbon.Services = services;
 
             ((Microsoft.Office.Interop.Excel.AppEvents_Event)this.Application).NewWorkbook += ThisAddIn_NewWorkbook;
 
             ((Microsoft.Office.Interop.Excel.AppEvents_Event)this.Application).SheetActivate += ThisAddIn_SheetActivate;
 
+            ((Microsoft.Office.Interop.Excel.AppEvents_Event)this.Application).WorkbookOpen += ThisAddIn_WorkbookOpen;
+
+            ((Microsoft.Office.Interop.Excel.AppEvents_Event)this.Application).WorkbookBeforeSave += ThisAddIn_WorkbookBeforeSave;     
+
             await program.OnStart(this.AddIn);
+        }
+
+        private void ThisAddIn_WorkbookBeforeSave(InteropWorkbook Wb, bool SaveAsUI, ref bool Cancel)
+        {
+            if (this.AddIn.WorkbookByInteropWorkbook.TryGetValue(Wb, out Workbook iworkbook))
+            {
+                iworkbook.TrySetCustomProperty(AppConstants.KeyWorkbook, true);
+
+                foreach (IWorksheet iworkSheet in iworkbook.Worksheets)
+                {
+                    var invoicesSheet = ((Program)this.AddIn.Program).SheetByWorksheet.FirstOrDefault(w => Equals(iworkSheet, w.Key) && w.Value is InvoicesSheet).Value;
+
+                    if (invoicesSheet != null)
+                    {
+                        ((InvoicesSheet)invoicesSheet).SaveTo(iworkbook);
+                    }
+                }
+            }
+        }      
+
+        private async void ThisAddIn_WorkbookOpen(Excel.Workbook Wb)
+        {
+            // this has been marked as a showCase workbook. So threat it as one we know.
+            var iWorkbook = this.AddIn.New(Wb);
+
+            object result = null;
+            if(iWorkbook.TryGetCustomProperty(AppConstants.KeyWorkbook, ref result))
+            {
+                if (Convert.ToBoolean(result))
+                {
+                    foreach (InteropWorksheet interopWorksheet in Wb.Sheets)
+                    {
+                        var worksheet = new Allors.Excel.Interop.Worksheet(iWorkbook, interopWorksheet);
+
+                        var customProperties = worksheet.GetCustomProperties();
+                        if (customProperties.Any(v =>Equals(AppConstants.KeySheet, v.Key) &&  Equals(nameof(InvoicesSheet), v.Value)))
+                        {
+                            var invoicesSheet = new InvoicesSheet(this.AddIn.Program, worksheet);
+
+                            await invoicesSheet.Load(iWorkbook);
+
+                            ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, invoicesSheet);
+                        }
+                    }                    
+                }
+            }
+            else
+            {
+               //TODO: remove the iWorkbook
+            }
         }
 
         private void ThisAddIn_SheetActivate(object Sh)

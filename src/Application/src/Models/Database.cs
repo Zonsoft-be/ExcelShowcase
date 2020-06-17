@@ -81,8 +81,8 @@ namespace Application.Data
             {
                 var array = ObjectsByType[typeof(T).Name];
                 Array.Resize(ref array, array.Length + 1);
-                array[array.Length] = instance;
-
+                array[array.Length -1] = instance;
+                ObjectsByType[typeof(T).Name] = array;
             }
             else
             {
@@ -109,7 +109,21 @@ namespace Application.Data
             {
                 instance.Id = this.Get<T>().Length + 1;
 
+                instance.OnSave(this);
+
                 this.Store<T>(instance);
+            }
+        }
+
+        public int Count<T>() where T : Identifiable
+        {
+            if (ObjectsByType.ContainsKey(typeof(T).Name))
+            {
+                return ObjectsByType[typeof(T).Name].Count();
+            }
+            else
+            {
+                return 0;
             }
         }
     }

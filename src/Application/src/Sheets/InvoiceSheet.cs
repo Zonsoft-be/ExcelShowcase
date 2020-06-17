@@ -34,11 +34,41 @@ namespace Application.Sheets
 
             this.Sheet.SheetActivated += this.Sheet_SheetActivated;
             this.Sheet.CellsChanged += Sheet_CellsChanged;
+
+            this.NamedRanges = this.Sheet.GetNamedRanges();
+
         }
 
-        private void Sheet_CellsChanged(object sender, CellChangedEvent e)
+        private async void Sheet_CellsChanged(object sender, CellChangedEvent e)
         {
-           
+            var addCells = e.Cells.Where(c => c.Column.Index == this.InvoiceLinesFirstColumn).ToArray();
+
+            // When a new detail line is added or deleted.
+            if (addCells.Length > 0)
+            {
+                // Cell with an detail invoice Line
+                foreach(ICell cell in addCells)
+                {
+                    // Add
+                    if("A".Equals(cell.ValueAsString, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var invoiceLine = (InvoiceLine)this.program.Services.Database.Create<InvoiceLine>();
+                        invoiceLine.Index = cell.Row.Index;
+                        this.Invoice.AddInvoiceLine(invoiceLine);
+                    }
+
+                    // Delete
+                    if ("D".Equals(cell.ValueAsString, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var invoiceLine = this.Invoice.InvoiceLines.FirstOrDefault(v => v.Index == cell.Row.Index);
+                        this.Invoice.RemoveInvoiceLine(invoiceLine);
+                    }
+                }
+
+                this.Controls.Bind();
+
+                await this.Sheet.Flush().ConfigureAwait(false);
+            }
         }
 
         public bool IsWorksheetUpToDate { get; set; }
@@ -62,40 +92,37 @@ namespace Application.Sheets
 
         private Controls Controls { get; }
 
+        public Range InvoiceLinesRange { get; private set; }
 
+        public int InvoiceLinesFirstColumn { get; private set; }
+        
         private Invoice Invoice {get; set;}
-               
+        public Range[] NamedRanges { get; }
 
         public async Task Refresh()
         {
-            var sheetRanges = this.Sheet.GetNamedRanges();
+            if(this.Invoice == null)
+            {
+                this.Invoice = (Invoice)this.program.Services.Database.Create<Invoice>();
+                this.Invoice.InvoiceDate = DateTime.Now;
+                this.Invoice.DeriveDueDate(Convert.ToInt32(this.program.Services.Configuration["InvoiceDueDate"]), this.program.Services.Configuration["InvoiceDueDateScheme"]);
+                this.Invoice.InvoiceNumber = this.program.Services.Database.Count<Invoice>() + 1;
+            }
 
-            this.Invoice = (Invoice) this.program.Services.Database.Create<Invoice>();
-            this.Invoice.InvoiceDate = DateTime.Now;
-            this.Invoice.InvoiceNumber = this.program.Services.Database.Get<Invoice>().Length + 1;
+            this.InvoiceLinesRange = this.NamedRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!Invoice_Lines".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            this.InvoiceLinesFirstColumn = this.InvoiceLinesRange.Column;
+            
+            var range = this.NamedRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!Invoice_Number".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            this.Controls.Label<Invoice>(range.Row, range.Column, this.Invoice, "InvoiceNumber");
 
-            var range = sheetRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!company_name".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
-            this.Controls.Static(range.Row, range.Column, this.program.Services.Configuration["Company_name"]);
-
-            range = sheetRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!company_street".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
-            this.Controls.Static(range.Row, range.Column, this.program.Services.Configuration["Company_Street"]);
-
-            range = sheetRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!company_city".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
-            this.Controls.Static(range.Row, range.Column, this.program.Services.Configuration["Company_City"]);
-
-            range = sheetRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!company_country".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
-            this.Controls.Static(range.Row, range.Column, this.program.Services.Configuration["Company_Country"]);
-
-            range = sheetRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!invoice_date".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            range = this.NamedRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!Invoice_Date".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
             var cell = this.Controls.Label<Invoice>(range.Row, range.Column, this.Invoice, "InvoiceDate");
             cell.NumberFormat = "dd-MM-YYYY";
 
-            range = sheetRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!invoice_number".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
-            this.Controls.Label<Invoice>(range.Row, range.Column, this.Invoice, "InvoiceNumber");
-
-            range = sheetRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!invoice_currency".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
-            this.Controls.Static(range.Row, range.Column, this.program.Services.Configuration["Company_Currency"]);
-
+            range = this.NamedRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!Invoice_Duedate".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            cell = this.Controls.Label<Invoice>(range.Row, range.Column, this.Invoice, "InvoiceDueDate");
+            cell.NumberFormat = "dd-MM-YYYY";
+                        
             this.Controls.Bind();
 
             await this.Sheet.Flush().ConfigureAwait(false);

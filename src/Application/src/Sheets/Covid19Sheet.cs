@@ -81,7 +81,7 @@ namespace Application.Sheets
                 this.Controls.Static(row, columnIndex++, data.code);
                 this.Controls.Static(row, columnIndex++, data.name);
                 this.Controls.Static(row, columnIndex++, data.population);
-                this.Controls.Static(row, columnIndex++, data.updated_at.ToString("dd-MM-yyyy hh:mm"));
+                this.Controls.Static(row, columnIndex++, data.updated_at.ToString("d-M-yy h:mm"));
                 this.Controls.Static(row, columnIndex++, data.latest_data.deaths);
                 this.Controls.Static(row, columnIndex++, data.latest_data.confirmed);
                 this.Controls.Static(row, columnIndex++, data.latest_data.recovered);

@@ -1,6 +1,9 @@
 ﻿using Allors.Excel;
+using Application.Models;
 using Application.Services;
 using Application.Sheets;
+using Application.Ui;
+using ProductManager.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,7 +19,6 @@ namespace Application
         public Program(IServiceLocator services)
         {
             this.Services = services;
-            this.BookByWorkbook = new ConcurrentDictionary<IWorkbook, IBook>();
             this.SheetByWorksheet = new ConcurrentDictionary<IWorksheet, ISheet>();
         }
         
@@ -33,8 +35,6 @@ namespace Application
         public IDictionary<IWorksheet, ISheet> SheetByWorksheet { get; private set; }
 
         public IServiceLocator Services { get; }
-
-        public IDictionary<IWorkbook, IBook> BookByWorkbook { get; private set; }
 
         /// <summary>
         /// Sets the Enabled value of control Id in the Ribbon. You should use some authentication and authorization infrastructure
@@ -104,6 +104,12 @@ namespace Application
         {
             switch (handle)
             {
+                case "MarkAsShowCaseWorkbook":
+
+                    this.ActiveWorkbook.TrySetCustomProperty(AppConstants.KeyWorkbook, true);
+                    
+                    break;
+
                 case "AddProductSheet":
                     {
                         var kvp = this.SheetByWorksheet.FirstOrDefault(v => Equals(v.Key.Workbook, this.ActiveWorkbook) && v.Value is ProductSheet);
@@ -168,9 +174,41 @@ namespace Application
                     }
                     break;
 
+                case "InvoicesSheet":
+                    {
+                        var kvp = this.SheetByWorksheet.FirstOrDefault(v => Equals(v.Key.Workbook, this.ActiveWorkbook) && v.Value is InvoicesSheet);
+
+                        InvoicesSheet invoicesSheet;
+
+                        if (kvp.Value == null)
+                        {
+                            var iWorksheet = this.ActiveWorkbook.AddWorksheet(0);
+                            iWorksheet.Name = "Invoices";
+                            invoicesSheet = new InvoicesSheet(this, iWorksheet);
+
+                            // Save so we can re-instate it as an invoicesSheet on startup
+                            var customProperties = new CustomProperties();
+                            customProperties.Add(AppConstants.KeySheet, nameof(InvoicesSheet));
+                            customProperties.Add(AppConstants.KeyCreated, DateTime.Now);
+                            customProperties.Add(AppConstants.KeyCreatedBy, this.Services.Configuration["Username"] );
+                            iWorksheet.SetCustomProperties(customProperties);
+
+                            this.SheetByWorksheet.Add(iWorksheet, invoicesSheet);
+                        }
+                        else
+                        {
+                            invoicesSheet = (InvoicesSheet)this.SheetByWorksheet[kvp.Key];
+                        }
+
+                        await invoicesSheet.Refresh().ConfigureAwait(false);
+
+                        invoicesSheet.Sheet.IsActive = true;
+                    }
+
+                    break;
                 case "AddInvoiceSheet":
                     {
-                        var wsCount = this.SheetByWorksheet.Count(v => Equals(v.Key.Workbook, this.ActiveWorkbook) && v.Value is InvoiceSheet);
+                        var wsCount = this.Services.Database.Count<Invoice>();
 
                         var iWorksheet = this.ActiveWorksheet;
                         iWorksheet.Name = $"Invoice {wsCount}";
