@@ -34,7 +34,7 @@ namespace Application.Data
 
             foreach (var index in Enumerable.Range(1, 10000))
             {
-                var product = (Product)this.Create<Product>();
+                var product = (Product)this.Create<Product>(null);
 
                 product.Name = $"Name {index}";
                 product.Description = $"Description {index}";
@@ -52,9 +52,10 @@ namespace Application.Data
             this.Store<Product>(products.ToArray());           
         }
 
-        public Identifiable Create<T>() where T : Identifiable
+        /// <inheritdoc/>       
+        public Identifiable Create<T>(Type t, params object[] parameters) where T : Identifiable
         {            
-            var instance = Activator.CreateInstance<T>();
+            var instance = (T) Activator.CreateInstance(typeof(T), parameters);
             Identifiables.Add(instance);
 
             var maxId = Identifiables.Max(i => i.Id);

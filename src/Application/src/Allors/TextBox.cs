@@ -1,12 +1,13 @@
-﻿namespace Application.Excel
+﻿namespace Application.Ui
 {
     using System;
-    using Allors.Workspace;
-    using Allors.Workspace.Meta;
     using Allors.Excel;
     using System.Globalization;
+    using Application.Models;
+    using System.Reflection;
+    using System.Net.Http.Headers;
 
-    public class TextBox : IControl
+    public class TextBox<T> : IControl where T : Identifiable
     {
         /// <summary>
         /// TextBox is a two-way binding object for excel cell value.
@@ -17,50 +18,38 @@
             this.Cell = cell;
         }
 
-        public ISessionObject SessionObject { get; internal set; }
+        public T SessionObject { get; internal set; }
 
-        public RoleType RoleType { get; internal set; }
+        public string RoleType { get; internal set; }
 
-        public RoleType DisplayRoleType { get; internal set; }
+        public string DisplayRoleType { get; internal set; }
 
         public Func<object, dynamic> ToDomain { get; internal set; }
 
         /// <summary>
         /// Func called just before writing to the excel cell. Last chance to change the value.
         /// </summary>
-        public Func<ISessionObject, dynamic> ToCell { get; internal set; }
+        public Func<T, dynamic> ToCell { get; internal set; }
 
         public ICell Cell { get; set; }
 
-        public RoleType RelationType { get; internal set; }
+        public string RelationType { get; internal set; }
 
         /// <summary>
         /// Factory must provide a new SessionObject when the OnCellChanged event is handled.
         /// </summary>
-        public Func<ICell, ISessionObject> Factory { get; internal set; }
+        public Func<ICell, T> Factory { get; internal set; }
 
         public void Bind()
         {
-            if (this.SessionObject != null && this.SessionObject.CanRead(this.DisplayRoleType ?? this.RoleType))
+            var propertyInfo = this.SessionObject.GetType().GetProperty(this.DisplayRoleType ?? this.RoleType);
+
+            if (propertyInfo.CanRead)
             {
-                if (this.RelationType != null)
-                {
-                    var relation = (ISessionObject)this.SessionObject.Get(this.DisplayRoleType ?? this.RoleType);
-                    if (relation != null)
-                    {
-                        if (relation.CanRead(this.RelationType))
-                        {
-                            this.SetCellValue(relation, this.RelationType);
-                        }
-                    }
-                }
-                else
-                {
-                    this.SetCellValue(this.SessionObject, this.DisplayRoleType ?? this.RoleType);
-                }
+                this.SetCellValue(this.SessionObject, propertyInfo);
             }
 
-            this.Cell.Style = this.SessionObject?.CanWrite(this.RoleType) == true || this.Factory != null 
+            this.Cell.Style = propertyInfo.CanWrite || this.Factory != null 
                 ? Constants.WriteStyle 
                 : Constants.ReadOnlyStyle;
         }
@@ -72,64 +61,120 @@
                 this.SessionObject = this.Factory(this.Cell);
             }
 
-            if (this.SessionObject?.CanWrite(this.RoleType) == true)
-            {
-                if (this.ToDomain == null)
+            var propertyInfo = this.SessionObject.GetType().GetProperty(this.RoleType);
+            System.TypeCode typeCode = Type.GetTypeCode(propertyInfo.PropertyType);
+
+            if (propertyInfo.PropertyType == typeof(decimal))
+            {                
+                if(this.Cell.Value == null)
                 {
-                    if (this.RoleType.ObjectType.ClrType == typeof(bool))
-                    {
-                        if (Constants.YES.Equals(Convert.ToString(this.Cell.Value, CultureInfo.CurrentCulture), StringComparison.OrdinalIgnoreCase))
-                        {
-                            this.SessionObject.Set(this.RoleType, true);
-                        }
-                        else
-                        {
-                            if (this.RoleType.IsRequired)
-                            {
-                                this.SessionObject.Set(this.RoleType, false);
-                            }
-                            else
-                            {
-                                this.SessionObject.Set(this.RoleType, null);
-                            }
-                        }
-                    }
-                    else if (this.RoleType.ObjectType.ClrType == typeof(DateTime))
-                    {
-                        if (double.TryParse(Convert.ToString(this.Cell.Value, CultureInfo.CurrentCulture), out double d))
-                        {
-                            var dt = DateTime.FromOADate(d);
-                            this.SessionObject.Set(this.RoleType, dt);
-                        }
-                        else
-                        {
-                            if (this.RoleType.IsRequired)
-                            {
-                                this.SessionObject.Set(this.RoleType, DateTime.MinValue);
-                            }
-                            else
-                            {
-                                this.SessionObject.Set(this.RoleType, null);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        this.SessionObject.Set(this.RoleType, this.Cell.Value);
-                    }
+                    propertyInfo.SetValue(this.SessionObject, default(decimal));
                 }
                 else
                 {
-                    var relation = this.ToDomain(this.Cell.Value);
-                    this.SessionObject.Set(this.RoleType, relation);
+                    decimal.TryParse(this.Cell.ValueAsString, out decimal result);
+                    propertyInfo.SetValue(this.SessionObject, result);
                 }
+            } 
+            else if (propertyInfo.PropertyType == typeof(decimal?))
+            {
+                if (this.Cell.Value == null)
+                {
+                    propertyInfo.SetValue(this.SessionObject, default(decimal?));
 
-                this.Cell.Style = Constants.ChangedStyle;
+                }
+                else
+                {
+                    propertyInfo.SetValue(this.SessionObject, Convert.ToDecimal(this.Cell.Value));
+                }
+            }
+            else if (propertyInfo.PropertyType == typeof(int))
+            {
+                if (this.Cell.Value == null)
+                {
+                    propertyInfo.SetValue(this.SessionObject, default(int));
+
+                }
+                else
+                {
+                    propertyInfo.SetValue(this.SessionObject, Convert.ToDecimal(this.Cell.Value));
+                }
+            }
+            else if (propertyInfo.PropertyType == typeof(int?))
+            {
+                if (this.Cell.Value == null)
+                {
+                    propertyInfo.SetValue(this.SessionObject, default(int?));
+
+                }
+                else
+                {
+                    propertyInfo.SetValue(this.SessionObject, Convert.ToInt32(this.Cell.Value));
+                }
+            }
+            else if (propertyInfo.PropertyType == typeof(DateTime))
+            {
+                if (this.Cell.Value == null)
+                {
+                    propertyInfo.SetValue(this.SessionObject, default(DateTime));
+
+                }
+                else
+                {
+                    var dt = DateTime.FromOADate(Convert.ToDouble(this.Cell.Value));
+                    propertyInfo.SetValue(this.SessionObject, dt);
+                }
+            }
+            else if (propertyInfo.PropertyType == typeof(DateTime?))
+            {
+                if (this.Cell.Value == null)
+                {
+                    propertyInfo.SetValue(this.SessionObject, default(DateTime?));
+
+                }
+                else
+                {
+                    var dt = DateTime.FromOADate(Convert.ToDouble(this.Cell.Value));
+                    propertyInfo.SetValue(this.SessionObject, dt);
+                }
+            }
+            else if (propertyInfo.PropertyType == typeof(bool))
+            {
+                if (this.Cell.Value == null)
+                {
+                    propertyInfo.SetValue(this.SessionObject, default(bool));
+
+                }
+                else
+                {
+                    propertyInfo.SetValue(this.SessionObject, Constants.YES.Equals(this.Cell.ValueAsString, StringComparison.OrdinalIgnoreCase) ? true : false  );
+                }
+            }
+            else if (propertyInfo.PropertyType == typeof(bool?))
+            {
+                if (this.Cell.Value == null)
+                {
+                    propertyInfo.SetValue(this.SessionObject, default(bool?));
+
+                }
+                else
+                {
+                    propertyInfo.SetValue(this.SessionObject, Constants.YES.Equals(this.Cell.ValueAsString, StringComparison.OrdinalIgnoreCase) ? true : false);
+                }
             }
             else
             {
+                if (this.Cell.Value == null)
+                {
+                    propertyInfo.SetValue(this.SessionObject, default(string));
 
+                }
+                else
+                {
+                    propertyInfo.SetValue(this.SessionObject, this.Cell.ValueAsString);
+                }
             }
+
         }
 
         public void Unbind()
@@ -137,11 +182,11 @@
             // TODO
         }
 
-        private void SetCellValue(ISessionObject obj, RoleType roleType)
+        private void SetCellValue(T obj, PropertyInfo propertyInfo)
         {
-            if (roleType.ObjectType.ClrType == typeof(bool))
+            if (propertyInfo.PropertyType == typeof(bool))
             {
-                if (obj.Get(roleType) is bool boolvalue && boolvalue)
+                if (propertyInfo.GetValue(obj) is bool boolvalue && boolvalue)
                 {
                     this.Cell.Value = Constants.YES;
                 }
@@ -150,21 +195,14 @@
                     this.Cell.Value = Constants.NO;
                 }
             }
-            else if (roleType.ObjectType.ClrType == typeof(DateTime))
+            else if (propertyInfo.PropertyType == typeof(DateTime))
             {
-                var dt = (DateTime?)obj?.Get(roleType);
+                var dt = (DateTime?)propertyInfo.GetValue(obj);
                 this.Cell.Value = dt?.ToOADate();
             }
             else
             {
-                if(this.ToCell != null)
-                {
-                    this.Cell.Value = this.ToCell(obj);
-                }
-                else
-                {
-                    this.Cell.Value = obj.Get(roleType);
-                }
+                this.Cell.Value = propertyInfo.GetValue(obj);
             }
         }
     }

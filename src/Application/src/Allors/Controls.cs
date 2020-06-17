@@ -151,38 +151,42 @@ namespace Application.Ui
             return null;
         }
 
-        ///// <inheritdoc cref="Application.Excel.TextBox"/>
-        //internal void TextBox(
-        //    int row, int column, ISessionObject sessionObject, RoleType roleType, RoleType relationType = null,
-        //    RoleType displayRoleType = null, 
-        //    string numberFormat = null,
-        //    Func<object, dynamic> toDomain = null, 
-        //    Func<ISessionObject, dynamic> toCell = null,
-        //    Func<ICell, ISessionObject> factory = null)
-        //{
-        //    if (sessionObject != null || factory != null)
-        //    {
-        //        var cell = this.Worksheet[row, column];
-        //        cell.NumberFormat = numberFormat;
+        /// <inheritdoc cref="Application.Excel.TextBox"/>
+        internal ICell TextBox<T>(
+            int row, int column, T sessionObject, string roleType, string relationType = null,
+            string displayRoleType = null,
+            string numberFormat = null,
+            Func<object, dynamic> toDomain = null,
+            Func<T, dynamic> toCell = null,
+            Func<ICell, T> factory = null) where T: Identifiable
+        {
+            if (sessionObject != null || factory != null)
+            {
+                var cell = this.Worksheet[row, column];
+                cell.NumberFormat = numberFormat;
 
-        //        if (!this.ControlByCell.TryGetValue(cell, out var control))
-        //        {
-        //            control = new TextBox(cell);
-        //            this.ControlByCell.TryAdd(cell, control);
-        //        }
+                if (!this.ControlByCell.TryGetValue(cell, out var control))
+                {
+                    control = new TextBox<T>(cell);
+                    this.ControlByCell.TryAdd(cell, control);
+                }
 
-        //        var textBox = (TextBox)control;
-        //        textBox.SessionObject = sessionObject;
-        //        textBox.RoleType = roleType;
-        //        textBox.RelationType = relationType;
-        //        textBox.DisplayRoleType = displayRoleType;
-        //        textBox.ToDomain = toDomain;
-        //        textBox.ToCell = toCell;
-        //        textBox.Factory = factory;
+                var textBox = (TextBox<T>)control;
+                textBox.SessionObject = sessionObject;
+                textBox.RoleType = roleType;
+                textBox.RelationType = relationType;
+                textBox.DisplayRoleType = displayRoleType;
+                textBox.ToDomain = toDomain;
+                textBox.ToCell = toCell;
+                textBox.Factory = factory;
 
-        //        this.ActiveControls.Add(control);
-        //    }
-        //}
+                this.ActiveControls.Add(control);
+
+                return cell;
+            }
+
+            return null;
+        }
 
         //internal void Select(int row, int column, Range options, ISessionObject sessionObject, RoleType roleType, RoleType relationType = null,
         //    RoleType displayRoleType = null,

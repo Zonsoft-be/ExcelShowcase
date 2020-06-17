@@ -50,18 +50,29 @@ namespace Application.Sheets
                 foreach(ICell cell in addCells)
                 {
                     // Add
-                    if("A".Equals(cell.ValueAsString, StringComparison.OrdinalIgnoreCase))
+                    if(!string.IsNullOrEmpty(cell.ValueAsString))
                     {
-                        var invoiceLine = (InvoiceLine)this.program.Services.Database.Create<InvoiceLine>();
-                        invoiceLine.Index = cell.Row.Index;
+                        var invoiceLine = (InvoiceLine)this.program.Services.Database.Create<InvoiceLine>(typeof(InvoiceLine), cell.Row.Index);                       
                         this.Invoice.AddInvoiceLine(invoiceLine);
+
+                        var columnIndex = cell.Column.Index;
+                        this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "Index");
+                        this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "Description");
+                        this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "Quantity");
+                        this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "UnitPrice");
+                        this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "TaxRate");
+                        this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "NetAmount");
                     }
 
                     // Delete
-                    if ("D".Equals(cell.ValueAsString, StringComparison.OrdinalIgnoreCase))
+                    if (string.IsNullOrEmpty(cell.ValueAsString))
                     {
                         var invoiceLine = this.Invoice.InvoiceLines.FirstOrDefault(v => v.Index == cell.Row.Index);
                         this.Invoice.RemoveInvoiceLine(invoiceLine);
+
+                        //TODO: cleanup
+                        var controls = this.Controls.ControlByCell.Select(v => Equals(v.Key.Tag, invoiceLine));
+
                     }
                 }
 
@@ -103,7 +114,7 @@ namespace Application.Sheets
         {
             if(this.Invoice == null)
             {
-                this.Invoice = (Invoice)this.program.Services.Database.Create<Invoice>();
+                this.Invoice = (Invoice)this.program.Services.Database.Create<Invoice>(null);
                 this.Invoice.InvoiceDate = DateTime.Now;
                 this.Invoice.DeriveDueDate(Convert.ToInt32(this.program.Services.Configuration["InvoiceDueDate"]), this.program.Services.Configuration["InvoiceDueDateScheme"]);
                 this.Invoice.InvoiceNumber = this.program.Services.Database.Count<Invoice>() + 1;
@@ -122,7 +133,21 @@ namespace Application.Sheets
             range = this.NamedRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!Invoice_Duedate".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
             cell = this.Controls.Label<Invoice>(range.Row, range.Column, this.Invoice, "InvoiceDueDate");
             cell.NumberFormat = "dd-MM-YYYY";
-                        
+
+            if (this.Invoice.InvoiceLines.Any())
+            {
+                foreach(var invoiceLine in this.Invoice.InvoiceLines.OrderBy(v => v.Index))
+                {
+                    var columnIndex = this.InvoiceLinesRange.Column;
+                    cell = this.Controls.TextBox<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "Index");
+                    cell = this.Controls.TextBox<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "Description");
+                    cell = this.Controls.TextBox<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "Quantity");
+                    cell = this.Controls.TextBox<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "UnitPrice");
+                    cell = this.Controls.TextBox<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "TaxRate");
+                    cell = this.Controls.TextBox<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "NetAmount");                    
+                }
+            }
+
             this.Controls.Bind();
 
             await this.Sheet.Flush().ConfigureAwait(false);

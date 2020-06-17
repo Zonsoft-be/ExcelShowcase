@@ -7,14 +7,15 @@ namespace Application.Models
 {
     public class InvoiceLine : Identifiable
     {
-        public InvoiceLine()
+        public InvoiceLine(int index)
         {
-            this.TaxRate = 0.21M;            
+            this.TaxRate = 0.21M;
+            this.Index = index;
         }
 
-        public int Index { get; set; }
+        public int Index { get; private set; }
 
-        public string ProductName { get; set; }
+        public string Description { get; set; }
 
         public decimal? TaxRate { get; set; }
 
