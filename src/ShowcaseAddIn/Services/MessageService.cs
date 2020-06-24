@@ -10,6 +10,13 @@ namespace ProductManager.Services
 {
     public class MessageService : IMessageService
     {
+        public bool Confirm(string message)
+        {
+            var dialogResult = MessageBox.Show(message, "Confirmation", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            return dialogResult == DialogResult.Yes;
+        }
+
         public void Show(string message)
         {
             MessageBox.Show(message);

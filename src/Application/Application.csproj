@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Allors.Excel" Version="1.0.21" />
+    <PackageReference Include="Allors.Excel" Version="1.0.30" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.5" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.5" />
     <PackageReference Include="ServiceStack.Common" Version="5.9.0" />

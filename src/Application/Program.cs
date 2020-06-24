@@ -211,13 +211,14 @@ namespace Application
                         var wsCount = this.Services.Database.Count<Invoice>();
 
                         var iWorksheet = this.ActiveWorksheet;
-                        iWorksheet.Name = $"Invoice {wsCount}";
+
                         var invoiceSheet = new InvoiceSheet(this, iWorksheet);
+                       
                         this.SheetByWorksheet.Add(iWorksheet, invoiceSheet);
 
                         await invoiceSheet.Refresh().ConfigureAwait(false);
 
-                        invoiceSheet.Sheet.IsActive = true;
+                        //invoiceSheet.Sheet.IsActive = true;
                     }
                     break;
 
@@ -241,6 +242,11 @@ namespace Application
                             {
                                 await invoiceSheet.Save();
                             }
+                        }
+
+                        foreach(ISheet sheet in this.SheetByWorksheet.Where(v => v.Value is InvoicesSheet).Select(v => v.Value))
+                        {
+                            sheet.IsWorksheetUpToDate = false;
                         }
                     }
                     break;

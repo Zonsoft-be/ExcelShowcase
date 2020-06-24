@@ -6,6 +6,8 @@ namespace Application
 {
     public interface ISheet
     {
+        bool IsWorksheetUpToDate { get; set; }
+
         System.Threading.Tasks.Task Refresh();
     }
 }

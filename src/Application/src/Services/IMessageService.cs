@@ -7,5 +7,7 @@ namespace Application.Services
     public interface IMessageService
     {
         void Show(string message);
+
+        bool Confirm(string message);
     }
 }

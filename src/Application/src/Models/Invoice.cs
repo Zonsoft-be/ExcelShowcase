@@ -1,4 +1,5 @@
 ﻿using Application.Data;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +14,13 @@ namespace Application.Models
 
         public Invoice()
         {
-            this.InvoiceLines = Array.Empty<InvoiceLine>();
+            if(this.InvoiceLines == null)
+            {
+                this.InvoiceLines = Array.Empty<InvoiceLine>();
+            }
         }
 
         public int InvoiceNumber { get; set; }
-
 
         public DateTime InvoiceDate { get; set; }
 
@@ -57,6 +60,11 @@ namespace Application.Models
 
         public override void OnSave(IDatabase database)
         {
+            if(this.InvoiceNumber == 0)
+            {
+                this.InvoiceNumber = database.Count<Invoice>();
+            }
+
             foreach(var line in this.InvoiceLines)
             {
                 line.OnSave(database);

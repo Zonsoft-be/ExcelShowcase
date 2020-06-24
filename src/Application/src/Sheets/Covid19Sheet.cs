@@ -32,9 +32,7 @@ namespace Application.Sheets
             this.Binder.ToDomained += this.Binder_ToDomained;
 
             this.Sheet.SheetActivated += this.Sheet_SheetActivated;
-        }
-
-        public bool IsWorksheetUpToDate { get; set; }
+        }        
 
         private async void Sheet_SheetActivated(object sender, string e)
         {
@@ -54,6 +52,8 @@ namespace Application.Sheets
         public Binder Binder { get; set; }
 
         private Controls Controls { get; }
+
+        public bool IsWorksheetUpToDate { get; set; }
 
         public async Task Refresh()
         {

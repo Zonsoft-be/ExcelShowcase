@@ -35,13 +35,18 @@ namespace Application.Sheets
             this.Sheet.SheetActivated += this.Sheet_SheetActivated;
             this.Sheet.CellsChanged += Sheet_CellsChanged;
 
+            this.Sheet.Name = $"{nameof(InvoiceSheet)}.{this.Sheet.Index}"; // Single Quotes to always allow spaces or special chars
+
+            // Fetch after we changed the name.
             this.NamedRanges = this.Sheet.GetNamedRanges();
 
         }
 
+        public int Index => this.Sheet.Index;
+
         private async void Sheet_CellsChanged(object sender, CellChangedEvent e)
         {
-            var addCells = e.Cells.Where(c => c.Column.Index == this.InvoiceLinesFirstColumn).ToArray();
+            var addCells = e.Cells.Where(c => c.Column.Index == this.InvoiceLinesFirstColumn + 1).ToArray();
 
             // When a new detail line is added or deleted.
             if (addCells.Length > 0)
@@ -50,18 +55,21 @@ namespace Application.Sheets
                 foreach(ICell cell in addCells)
                 {
                     // Add
-                    if(!string.IsNullOrEmpty(cell.ValueAsString))
+                    if(!string.IsNullOrEmpty(cell.ValueAsString) && !this.Invoice.InvoiceLines.Any(v => v.Index == cell.Row.Index))
                     {
                         var invoiceLine = (InvoiceLine)this.program.Services.Database.Create<InvoiceLine>(typeof(InvoiceLine), cell.Row.Index);                       
                         this.Invoice.AddInvoiceLine(invoiceLine);
 
-                        var columnIndex = cell.Column.Index;
-                        this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "Index");
+                        var columnIndex = cell.Column.Index - 1;
+                        this.Controls.Label<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "Index");
                         this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "Description");
                         this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "Quantity");
                         this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "UnitPrice");
-                        this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "TaxRate");
-                        this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "NetAmount");
+                        this.Controls.Label<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "TaxRate");
+
+                        invoiceLine.Description = cell.ValueAsString;
+                                                
+
                     }
 
                     // Delete
@@ -80,9 +88,7 @@ namespace Application.Sheets
 
                 await this.Sheet.Flush().ConfigureAwait(false);
             }
-        }
-
-        public bool IsWorksheetUpToDate { get; set; }
+        }        
 
         private async void Sheet_SheetActivated(object sender, string e)
         {
@@ -108,7 +114,9 @@ namespace Application.Sheets
         public int InvoiceLinesFirstColumn { get; private set; }
         
         private Invoice Invoice {get; set;}
+
         public Range[] NamedRanges { get; }
+        public bool IsWorksheetUpToDate { get; set; }
 
         public async Task Refresh()
         {
@@ -116,21 +124,20 @@ namespace Application.Sheets
             {
                 this.Invoice = (Invoice)this.program.Services.Database.Create<Invoice>(null);
                 this.Invoice.InvoiceDate = DateTime.Now;
-                this.Invoice.DeriveDueDate(Convert.ToInt32(this.program.Services.Configuration["InvoiceDueDate"]), this.program.Services.Configuration["InvoiceDueDateScheme"]);
-                this.Invoice.InvoiceNumber = this.program.Services.Database.Count<Invoice>() + 1;
+                this.Invoice.DeriveDueDate(Convert.ToInt32(this.program.Services.Configuration["InvoiceDueDate"]), this.program.Services.Configuration["InvoiceDueDateScheme"]);                
             }
 
-            this.InvoiceLinesRange = this.NamedRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!Invoice_Lines".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            this.InvoiceLinesRange = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Invoice_Lines".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
             this.InvoiceLinesFirstColumn = this.InvoiceLinesRange.Column;
             
-            var range = this.NamedRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!Invoice_Number".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            var range = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Invoice_Number".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
             this.Controls.Label<Invoice>(range.Row, range.Column, this.Invoice, "InvoiceNumber");
 
-            range = this.NamedRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!Invoice_Date".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            range = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Invoice_Date".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
             var cell = this.Controls.Label<Invoice>(range.Row, range.Column, this.Invoice, "InvoiceDate");
             cell.NumberFormat = "dd-MM-YYYY";
 
-            range = this.NamedRanges.FirstOrDefault(r => $"'{this.Sheet.Name}'!Invoice_Duedate".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            range = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Invoice_Duedate".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
             cell = this.Controls.Label<Invoice>(range.Row, range.Column, this.Invoice, "InvoiceDueDate");
             cell.NumberFormat = "dd-MM-YYYY";
 
@@ -139,12 +146,11 @@ namespace Application.Sheets
                 foreach(var invoiceLine in this.Invoice.InvoiceLines.OrderBy(v => v.Index))
                 {
                     var columnIndex = this.InvoiceLinesRange.Column;
-                    cell = this.Controls.TextBox<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "Index");
+                    cell = this.Controls.Label<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "Index");
                     cell = this.Controls.TextBox<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "Description");
                     cell = this.Controls.TextBox<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "Quantity");
                     cell = this.Controls.TextBox<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "UnitPrice");
-                    cell = this.Controls.TextBox<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "TaxRate");
-                    cell = this.Controls.TextBox<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "NetAmount");                    
+                    cell = this.Controls.Label<InvoiceLine>(this.InvoiceLinesRange.Row, columnIndex++, invoiceLine, "TaxRate");                                       
                 }
             }
 
@@ -163,7 +169,17 @@ namespace Application.Sheets
 
             var file = new FileInfo(Path.Combine(path, fileName));
 
-            this.Sheet.SaveAsPDF(file, false, false, ignorePrintAreas: false);
+            if (file.Exists)
+            {
+                if(this.program.Services.MessageService.Confirm($"{file.Name} already exist. Do you want to overwrite this file?"))
+                {
+                    this.Sheet.SaveAsPDF(file, overwriteExistingFile: true, false, ignorePrintAreas: false);
+                }
+            }
+            else
+            {
+                this.Sheet.SaveAsPDF(file, false, false, ignorePrintAreas: false);
+            }
         }
 
         internal async Task Save()
@@ -173,7 +189,7 @@ namespace Application.Sheets
                 this.program.Services.Database.Save(this.Invoice);
             }
 
-            await Task.CompletedTask;
+            await this.Refresh().ConfigureAwait(false);           
         }
     }
 }

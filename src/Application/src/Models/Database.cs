@@ -57,8 +57,7 @@ namespace Application.Data
         {            
             var instance = (T) Activator.CreateInstance(typeof(T), parameters);
             Identifiables.Add(instance);
-
-            var maxId = Identifiables.Max(i => i.Id);
+                        
             instance.Id = -1;
 
             return instance;
@@ -108,12 +107,11 @@ namespace Application.Data
         {
             if (instance.Id == -1)
             {
-                instance.Id = this.Get<T>().Length + 1;
-
-                instance.OnSave(this);
-
+                instance.Id = this.Get<T>().Length + 1;      
                 this.Store<T>(instance);
             }
+
+            instance.OnSave(this);
         }
 
         public int Count<T>() where T : Identifiable
