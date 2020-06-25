@@ -5,10 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="src\Allors\ComboBox.cs" />
-    <Compile Remove="src\Allors\CompositeControl.cs" />
-    <Compile Remove="src\Allors\ITransformation.cs" />
-    <Compile Remove="src\Allors\TransFormations.cs" />
+    <Compile Remove="src\GenericControls\ITransformation.cs" />
+    <Compile Remove="src\GenericControls\TransFormations.cs" />
   </ItemGroup>
 
   <ItemGroup>

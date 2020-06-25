@@ -1,13 +1,12 @@
-﻿namespace Application.Excel
+﻿namespace Application.Ui
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Allors.Workspace;
-    using Allors.Workspace.Meta;
     using Allors.Excel;
+    using Application.Models;
 
-    public class CompositeControl : IControl
+    public class CompositeControl<T> : IControl where T : Identifiable
     {
         /// <summary>
         /// Composite control can Bind multiple cells to a common SessionObject.RoleType
@@ -27,13 +26,13 @@
 
         private IDictionary<object, IControl> Members { get; }
 
-        public void TextBox(ISessionObject sessionObject, RoleType roleType)
+        public void TextBox(T sessionObject, string roleType)
         {
-            var key = $"{sessionObject?.Id}:{roleType?.Id}";
+            var key = $"{sessionObject?.Id}:{roleType}";
 
             if (!this.Members.TryGetValue(key, out var control))
             {
-                var textBox = new TextBox(this.Cell);
+                var textBox = new TextBox<T>(this.Cell);
 
                 textBox.SessionObject = sessionObject;
                 textBox.RoleType = roleType;

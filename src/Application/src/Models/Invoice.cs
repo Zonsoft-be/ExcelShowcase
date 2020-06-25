@@ -26,7 +26,7 @@ namespace Application.Models
 
         public DateTime InvoiceDueDate { get; set; }
 
-        public Customer Customer { get; set; }
+        public Organisation Customer { get; set; }
 
         public decimal? NetAmount { get; set; }
 

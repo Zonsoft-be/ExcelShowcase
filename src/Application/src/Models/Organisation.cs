@@ -4,8 +4,16 @@ using System.Text;
 
 namespace Application.Models
 {
-    public class Customer : Identifiable
+    public class Organisation : Identifiable
     {
+        public const string TagId = "{344583ED-FAEC-495E-AE45-FAD59F457AF2}";
+
+        public Organisation()
+        {            
+        }
+
+        public string Lookup { get; set; }
+
         public string Name { get; set; }
 
         public string Description { get; set; }

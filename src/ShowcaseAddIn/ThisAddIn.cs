@@ -62,6 +62,13 @@ namespace ProductManager
                     {
                         ((InvoicesSheet)invoicesSheet).SaveTo(iworkbook);
                     }
+
+                    var organisationsSheet = ((Program)this.AddIn.Program).SheetByWorksheet.FirstOrDefault(w => Equals(iworkSheet, w.Key) && w.Value is OrganisationsSheet).Value;
+
+                    if (organisationsSheet != null)
+                    {
+                        ((OrganisationsSheet)organisationsSheet).SaveTo(iworkbook);
+                    }
                 }
             }
         }      
@@ -88,6 +95,15 @@ namespace ProductManager
                             await invoicesSheet.Load(iWorkbook);
 
                             ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, invoicesSheet);
+                        }
+
+                        if (customProperties.Any(v => Equals(AppConstants.KeySheet, v.Key) && Equals(nameof(OrganisationsSheet), v.Value)))
+                        {
+                            var organisationsSheet = new OrganisationsSheet(this.AddIn.Program, worksheet);
+
+                            await organisationsSheet.Load(iWorkbook);
+
+                            ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, organisationsSheet);
                         }
                     }                    
                 }

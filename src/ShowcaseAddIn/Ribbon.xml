@@ -7,8 +7,12 @@
           <button id="MarkAsShowCaseWorkbook" onAction="OnClick"  label="Mark as Showcase (remember me)" imageMso=" Lock" size="large" getEnabled="GetEnabled"/>
           <button id="AddProductSheet" onAction="OnClick"  label="Add Product Sheet" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>
           <button id="ListCovid19Sheet" onAction="OnClick"  label="Covid 19" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>
-        </group>      
-        <group id="Templates" label="Invoicing">
+        </group>
+        <group id="OrganisationId" label="Organisations">
+          <button id="OrganisationsSheet" onAction="OnClick" label="Organisations" imageMso="TableInsert" size="large" getEnabled="GetEnabled"/>
+          <button id="SaveOrganisationsSheet" onAction="OnClick" label="Save" imageMso="FileSave" size="large"  getEnabled="GetEnabled"/>          
+        </group>
+        <group id="InvoiceId" label="Invoicing">
           <button id="InvoicesSheet" onAction="OnClick" label="Invoices" imageMso="TableInsert" size="large" getEnabled="GetEnabled"/>
           <button id="AddInvoiceSheet" onAction="AddInvoiceSheet" label="Add Invoice Sheet" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>
           <button id="SaveInvoiceSheet" onAction="OnClick" label="Save" imageMso="FileSave" size="large"  getEnabled="GetEnabled"/>

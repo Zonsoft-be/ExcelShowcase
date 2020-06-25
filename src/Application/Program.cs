@@ -250,7 +250,23 @@ namespace Application
                         }
                     }
                     break;
+                                    
+                case "SaveOrganisationsSheet":
+                    {
+                        if (this.SheetByWorksheet.TryGetValue(this.ActiveWorksheet, out var iSheet))
+                        {
+                            if (iSheet is OrganisationsSheet organisationsSheet)
+                            {
+                                await organisationsSheet.Save();
+                            }
+                        }
 
+                        foreach (ISheet sheet in this.SheetByWorksheet.Where(v => v.Value is OrganisationsSheet).Select(v => v.Value))
+                        {
+                            sheet.IsWorksheetUpToDate = false;
+                        }
+                    }
+                    break;
                 case "PrintInvoiceSheet":
                     {
                         if (this.SheetByWorksheet.TryGetValue(this.ActiveWorksheet, out var iSheet))
@@ -263,6 +279,38 @@ namespace Application
                     }
                     break;
 
+                case "OrganisationsSheet":
+                    {
+                        var kvp = this.SheetByWorksheet.FirstOrDefault(v => Equals(v.Key.Workbook, this.ActiveWorkbook) && v.Value is OrganisationsSheet);
+
+                        OrganisationsSheet organisationsSheet;
+
+                        if (kvp.Value == null)
+                        {
+                            var iWorksheet = this.ActiveWorkbook.AddWorksheet(0);
+                            iWorksheet.Name = "Organisations";
+                            organisationsSheet = new OrganisationsSheet(this, iWorksheet);
+
+                            // Save so we can re-instate it as an invoicesSheet on startup
+                            var customProperties = new CustomProperties();
+                            customProperties.Add(AppConstants.KeySheet, nameof(OrganisationsSheet));
+                            customProperties.Add(AppConstants.KeyCreated, DateTime.Now);
+                            customProperties.Add(AppConstants.KeyCreatedBy, this.Services.Configuration["Username"]);
+                            iWorksheet.SetCustomProperties(customProperties);
+
+                            this.SheetByWorksheet.Add(iWorksheet, organisationsSheet);
+                        }
+                        else
+                        {
+                            organisationsSheet = (OrganisationsSheet)this.SheetByWorksheet[kvp.Key];
+                        }
+
+                        await organisationsSheet.Refresh().ConfigureAwait(false);
+
+                        organisationsSheet.Sheet.IsActive = true;
+                    }
+
+                    break;
 
             }
         }
