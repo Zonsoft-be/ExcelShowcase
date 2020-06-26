@@ -55,7 +55,7 @@ namespace ProductManager
             {
                 iworkbook.TrySetCustomProperty(AppConstants.KeyWorkbook, true);
 
-                foreach (Allors.Excel.IWorksheet iworkSheet in iworkbook.Worksheets)
+                foreach (Worksheet iworkSheet in iworkbook.Worksheets)
                 {
                     var invoicesSheet = ((Program)this.AddIn.Program).SheetByWorksheet.FirstOrDefault(w => Equals(iworkSheet, w.Key) && w.Value is InvoicesSheet).Value;
 

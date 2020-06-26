@@ -1,6 +1,7 @@
 ﻿using Allors.Excel;
 using Application.Models;
 using Application.Ui;
+using ProductManager.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,6 +35,13 @@ namespace Application.Sheets
             this.Sheet.SheetActivated += this.Sheet_SheetActivated;
 
             this.Sheet.CellsChanged += Sheet_CellsChanged;
+
+            // Save so we can re-instate it as an invoicesSheet on startup
+            var customProperties = new CustomProperties();
+            customProperties.Add(AppConstants.KeySheet, nameof(OrganisationsSheet));
+            customProperties.Add(AppConstants.KeyCreated, DateTime.Now);
+            customProperties.Add(AppConstants.KeyCreatedBy, this.program.Services.Configuration["Username"]);
+            this.Sheet.SetCustomProperties(customProperties);
         }
 
         private async void Sheet_CellsChanged(object sender, CellChangedEvent e)

@@ -1,6 +1,7 @@
 ﻿using Allors.Excel;
 using Application.Models;
 using Application.Ui;
+using ProductManager.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,6 +33,13 @@ namespace Application.Sheets
             this.Binder.ToDomained += this.Binder_ToDomained;
 
             this.Sheet.SheetActivated += this.Sheet_SheetActivated;
+
+            // Save so we can re-instate it as an invoicesSheet on startup
+            var customProperties = new CustomProperties();
+            customProperties.Add(AppConstants.KeySheet, nameof(InvoicesSheet));
+            customProperties.Add(AppConstants.KeyCreated, DateTime.Now);
+            customProperties.Add(AppConstants.KeyCreatedBy, this.program.Services.Configuration["Username"]);
+            this.Sheet.SetCustomProperties(customProperties);
         }
 
         public bool IsWorksheetUpToDate { get; set; }

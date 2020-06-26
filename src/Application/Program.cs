@@ -177,15 +177,8 @@ namespace Application
                         if (kvp.Value == null)
                         {
                             var iWorksheet = this.ActiveWorkbook.AddWorksheet(0);
-                            iWorksheet.Name = "Invoices";
-                            invoicesSheet = new InvoicesSheet(this, iWorksheet);
-
-                            // Save so we can re-instate it as an invoicesSheet on startup
-                            var customProperties = new CustomProperties();
-                            customProperties.Add(AppConstants.KeySheet, nameof(InvoicesSheet));
-                            customProperties.Add(AppConstants.KeyCreated, DateTime.Now);
-                            customProperties.Add(AppConstants.KeyCreatedBy, this.Services.Configuration["Username"] );
-                            iWorksheet.SetCustomProperties(customProperties);
+                            iWorksheet.Name = KnownNames.InvoicesSheetName;
+                            invoicesSheet = new InvoicesSheet(this, iWorksheet);                            
 
                             this.SheetByWorksheet.Add(iWorksheet, invoicesSheet);
                         }
@@ -285,14 +278,7 @@ namespace Application
                         {
                             var iWorksheet = this.ActiveWorkbook.AddWorksheet(0);
                             iWorksheet.Name = "Organisations";
-                            organisationsSheet = new OrganisationsSheet(this, iWorksheet);
-
-                            // Save so we can re-instate it as an invoicesSheet on startup
-                            var customProperties = new CustomProperties();
-                            customProperties.Add(AppConstants.KeySheet, nameof(OrganisationsSheet));
-                            customProperties.Add(AppConstants.KeyCreated, DateTime.Now);
-                            customProperties.Add(AppConstants.KeyCreatedBy, this.Services.Configuration["Username"]);
-                            iWorksheet.SetCustomProperties(customProperties);
+                            organisationsSheet = new OrganisationsSheet(this, iWorksheet);                          
 
                             this.SheetByWorksheet.Add(iWorksheet, organisationsSheet);
                         }
