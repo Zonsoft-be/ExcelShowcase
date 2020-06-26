@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Encodings.Web;
 
 namespace Application.Models
 {
@@ -10,12 +11,8 @@ namespace Application.Models
         {            
         }
 
-        public string Lookup { get; set; }
-
         public string Name { get; set; }
-
-        public string Description { get; set; }
-
+        
         public  string  Street { get; set; }
 
         public string City { get; set; }
@@ -23,5 +20,11 @@ namespace Application.Models
         public string Country { get; set; }
         
         public string VatNumber { get; set; }
+
+        public string Email { get; set; }
+
+        public string Phone { get; set; }
+
+        public string FinancialContact { get; set; }
     }
 }

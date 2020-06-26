@@ -53,15 +53,16 @@ namespace Application.Sheets
                         this.Organisations.Add(organisation);
 
                         var colIndex = 0;
-                        this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Lookup");
                         this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Name");
-                        this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Description");
                         this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Street");
                         this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "City");
                         this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Country");
                         this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "VatNumber");
+                        this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Email");
+                        this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Phone");
+                        this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "FinancialContact");
 
-                        organisation.Lookup = cell.ValueAsString;
+                        organisation.Name = cell.ValueAsString;
 
 
                     }
@@ -111,33 +112,38 @@ namespace Application.Sheets
 
         private async Task RefreshSheet()
         {
+            var colIndex = 0;
             //
-            this.Controls.Static(0, 0, "ID");
-            this.Controls.Static(0, 1, "Name");
-            this.Controls.Static(0, 2, "Description");
-            this.Controls.Static(0, 3, "Street");
-            this.Controls.Static(0, 4, "City");
-            this.Controls.Static(0, 5, "Country");
-            this.Controls.Static(0, 6, "VatNumber");
+            this.Controls.Static(0, colIndex++, "Name");
+            this.Controls.Static(0, colIndex++, "Street");
+            this.Controls.Static(0, colIndex++, "City");
+            this.Controls.Static(0, colIndex++, "Country");
+            this.Controls.Static(0, colIndex++, "VatNumber");
+            this.Controls.Static(0, colIndex++, "Email");
+            this.Controls.Static(0, colIndex++, "Phone");
+            this.Controls.Static(0, colIndex++, "FinancialContact");
 
             this.Sheet.FreezePanes(new Range(0, -1, 0, 0));
 
             var rowIndex = 1;
 
-            foreach (var organisation in this.Organisations.OrderBy(o => o.Lookup))
+            foreach (var organisation in this.Organisations.OrderBy(o => o.Name))
             {
-                var colIndex = 0;
+                colIndex = 0;
 
-                this.Controls.TextBox(rowIndex, colIndex++, organisation, "Lookup");
                 this.Controls.TextBox(rowIndex, colIndex++, organisation, "Name");
-                this.Controls.TextBox(rowIndex, colIndex++, organisation, "Description");
                 this.Controls.TextBox(rowIndex, colIndex++, organisation, "Street");
                 this.Controls.TextBox(rowIndex, colIndex++, organisation, "City");
                 this.Controls.TextBox(rowIndex, colIndex++, organisation, "Country");
                 this.Controls.TextBox(rowIndex, colIndex++, organisation, "VatNumber");
+                this.Controls.TextBox(rowIndex, colIndex++, organisation, "Email");
+                this.Controls.TextBox(rowIndex, colIndex++, organisation, "Phone");
+                this.Controls.TextBox(rowIndex, colIndex++, organisation, "FinancialContact");
 
                 rowIndex++;
             }
+
+            this.Sheet.Workbook.SetNamedRange("ValidationList.Organisations", new Range(1, 0, this.Organisations.Count, 1, this.Sheet));
 
             this.Controls.Bind();
 

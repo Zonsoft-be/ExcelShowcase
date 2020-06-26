@@ -127,6 +127,8 @@ namespace Application.Sheets
                 this.Invoice.DeriveDueDate(Convert.ToInt32(this.program.Services.Configuration["InvoiceDueDate"]), this.program.Services.Configuration["InvoiceDueDateScheme"]);                
             }
 
+           var customerSelectRange = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Customer_Name".Equals(r.Name, StringComparison.OrdinalIgnoreCase));           
+
             this.InvoiceLinesRange = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Invoice_Lines".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
             this.InvoiceLinesFirstColumn = this.InvoiceLinesRange.Column;
             
