@@ -21,7 +21,7 @@ namespace Application.Data
         {
             this.Identifiables = new ConcurrentBag<Identifiable>();
 
-            this.ObjectsByType = new ConcurrentDictionary<string, Identifiable[]>();
+            this.ObjectsByType = new ConcurrentDictionary<string,  Identifiable[]>();
 
             this.Init();
         }
@@ -124,6 +124,18 @@ namespace Application.Data
             {
                 return 0;
             }
+        }
+
+        public T FirstOrDefault<T>(Func<T, bool> func) where T : Identifiable
+        {
+            if (ObjectsByType.ContainsKey(typeof(T).Name))
+            {             
+                return ((T[])ObjectsByType[typeof(T).Name]).FirstOrDefault<T>(func);
+            }
+            else
+            {
+                return null;
+            }            
         }
     }
 }

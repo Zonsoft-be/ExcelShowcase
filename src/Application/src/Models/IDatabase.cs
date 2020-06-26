@@ -20,6 +20,8 @@ namespace Application.Data
 
         T[] Get<T>() where T : Identifiable;
 
+        T FirstOrDefault<T>(Func<T, bool> func) where T : Identifiable;
+
         int Count<T>() where T : Identifiable;
 
         void Save<T>(T instance) where T : Identifiable;

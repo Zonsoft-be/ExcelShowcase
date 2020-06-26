@@ -82,12 +82,10 @@ namespace Application.Sheets
                         var controls = this.Controls.ControlByCell.Select(v => Equals(v.Key.Tag, invoiceLine));
 
                     }
-                }
-
-                this.Controls.Bind();
-
-                await this.Sheet.Flush().ConfigureAwait(false);
+                }               
             }
+
+            await this.Refresh().ConfigureAwait(false);
         }        
 
         private async void Sheet_SheetActivated(object sender, string e)
@@ -127,12 +125,35 @@ namespace Application.Sheets
                 this.Invoice.DeriveDueDate(Convert.ToInt32(this.program.Services.Configuration["InvoiceDueDate"]), this.program.Services.Configuration["InvoiceDueDateScheme"]);                
             }
 
-           var customerSelectRange = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Customer_Name".Equals(r.Name, StringComparison.OrdinalIgnoreCase));           
+            var customerSelectRange = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Customer_Name".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+
+            var options = new Range(0, 0, null, null, null, KnownNames.ValidationRangeOrganisations);
+
+            this.Controls.Select<Invoice>(customerSelectRange.Row, customerSelectRange.Column, options, this.Invoice, "Customer", "Name", 
+                toDomain: (object key) =>
+                {
+                    return this.program.Services.Database.FirstOrDefault<Organisation>(o => string.Equals(o.Name, key));
+                });
+
+            var range = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Customer_Street".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            this.Controls.Label<Organisation>(range.Row, range.Column, this.Invoice.Customer, "Street");
+
+            range = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Customer_City".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            this.Controls.Label<Organisation>(range.Row, range.Column, this.Invoice.Customer, "City");
+
+            range = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Customer_Country".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            this.Controls.Label<Organisation>(range.Row, range.Column, this.Invoice.Customer, "Country");
+
+            range = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Customer_Vat".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            this.Controls.Label<Organisation>(range.Row, range.Column, this.Invoice.Customer, "VatNumber");
+
+            range = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Customer_Contact".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            this.Controls.Label<Organisation>(range.Row, range.Column, this.Invoice.Customer, "FinancialContact");
 
             this.InvoiceLinesRange = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Invoice_Lines".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
             this.InvoiceLinesFirstColumn = this.InvoiceLinesRange.Column;
             
-            var range = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Invoice_Number".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            range = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Invoice_Number".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
             this.Controls.Label<Invoice>(range.Row, range.Column, this.Invoice, "InvoiceNumber");
 
             range = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Invoice_Date".Equals(r.Name, StringComparison.OrdinalIgnoreCase));

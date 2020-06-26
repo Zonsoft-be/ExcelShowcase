@@ -151,7 +151,7 @@ namespace Application.Sheets
                 rowIndex++;
             }
 
-            this.Sheet.Workbook.SetNamedRange("ValidationList.Organisations", new Range(1, 0, this.Organisations.Count, 1, this.Sheet));
+            this.Sheet.Workbook.SetNamedRange(KnownNames.ValidationRangeOrganisations, new Range(1, 0, this.Organisations.Count, 1, this.Sheet));
 
             this.Controls.Bind();
 

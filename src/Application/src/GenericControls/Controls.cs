@@ -188,53 +188,53 @@ namespace Application.Ui
             return null;
         }
 
-        //internal void Select(int row, int column, Range options, ISessionObject sessionObject, RoleType roleType, RoleType relationType = null,
-        //    RoleType displayRoleType = null,
-        //    Func<object, dynamic> getRelation = null,
-        //    string numberFormat = null,
-        //    bool hideInCellDropDown = false)
-        //{
-        //    if (sessionObject != null)
-        //    {
-        //        var cell = this.Worksheet[row, column];
-        //        cell.Options = options ?? throw new ArgumentNullException(nameof(options));
-        //        cell.NumberFormat = numberFormat;
-        //        cell.IsRequired = roleType.IsRequired;
-        //        cell.HideInCellDropdown = hideInCellDropDown;
+        internal void Select<T>(int row, int column, Range options, T sessionObject, string roleType, string relationType = null,
+            string displayRoleType = null,
+            Func<object, dynamic> toDomain = null,
+            string numberFormat = null,
+            bool hideInCellDropDown = false) where T : Identifiable
+        {
+            if (sessionObject != null)
+            {
+                var cell = this.Worksheet[row, column];
+                cell.Options = options ?? throw new ArgumentNullException(nameof(options));
+                cell.NumberFormat = numberFormat;
+                //cell.IsRequired = roleType.IsRequired;
+                cell.HideInCellDropdown = hideInCellDropDown;
 
-        //        if (!this.ControlByCell.TryGetValue(cell, out var control))
-        //        {
-        //            control = new ComboBox(cell);
-        //            this.ControlByCell.TryAdd(cell, control);
-        //        }
+                if (!this.ControlByCell.TryGetValue(cell, out var control))
+                {
+                    control = new ComboBox<T>(cell);
+                    this.ControlByCell.TryAdd(cell, control);
+                }
 
-        //        var comboBox = (ComboBox)control;
+                var comboBox = (ComboBox<T>)control;
 
-        //        comboBox.SessionObject = sessionObject;
-        //        comboBox.RoleType = roleType;
-        //        comboBox.RelationType = relationType;
-        //        comboBox.DisplayRoleType = displayRoleType;
-        //        comboBox.ToDomain = getRelation;
+                comboBox.SessionObject = sessionObject;
+                comboBox.RoleType = roleType;
+                comboBox.RelationType = relationType;
+                comboBox.DisplayRoleType = displayRoleType;
+                comboBox.ToDomain = toDomain;
 
-        //        this.ActiveControls.Add(control);
-        //    }
-        //}
+                this.ActiveControls.Add(control);
+            }
+        }
 
-        //internal CompositeControl Composite(int row, int column)
-        //{
-        //    var cell = this.Worksheet[row, column];
+        internal CompositeControl<T> Composite<T>(int row, int column) where T : Identifiable
+        {
+            var cell = this.Worksheet[row, column];
 
-        //    if (!this.ControlByCell.TryGetValue(cell, out var control))
-        //    {
-        //        control = new CompositeControl(this, cell);
+            if (!this.ControlByCell.TryGetValue(cell, out var control))
+            {
+                control = new CompositeControl<T>(this, cell);
 
-        //        this.ControlByCell.TryAdd(cell, control);
-        //    }
+                this.ControlByCell.TryAdd(cell, control);
+            }
 
-        //    this.ActiveControls.Add(control);
+            this.ActiveControls.Add(control);
 
-        //    return (CompositeControl)control;
-        //}
+            return (CompositeControl<T>)control;
+        }
 
         internal void Bind()
         {

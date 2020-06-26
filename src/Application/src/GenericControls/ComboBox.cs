@@ -77,7 +77,15 @@ namespace Application.Ui
             }
             else
             {
-                propertyInfo.SetValue(this.SessionObject, this.Cell.ValueAsString);
+                if(this.ToDomain != null)
+                {
+                    var relation = this.ToDomain(this.Cell.Value);
+                    propertyInfo.SetValue(this.SessionObject, relation);
+                }
+                else
+                {
+                    propertyInfo.SetValue(this.SessionObject, this.Cell.ValueAsString);
+                }
             }
         }
 
@@ -106,7 +114,19 @@ namespace Application.Ui
             }
             else
             {
-                this.Cell.Value = propertyInfo.GetValue(obj);
+                if(this.RelationType != null)
+                {
+                    var relation = propertyInfo.GetValue(obj);
+                    var relationPropertyInfo = relation?.GetType().GetProperty(this.RelationType);
+
+                    this.Cell.Value = relationPropertyInfo?.GetValue(relation);
+
+                }
+                else
+                {
+                    this.Cell.Value = propertyInfo.GetValue(obj);
+
+                }
             }
         }
     }
