@@ -92,6 +92,8 @@
             {
                 propertyInfo.SetValue(this.SessionObject, this.Cell.ValueAsString);              
             }
+
+            this.Cell.Style = Constants.ChangedStyle;
         }
 
         public void Unbind()

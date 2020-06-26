@@ -46,7 +46,9 @@ namespace Application.Sheets
 
         private async void Sheet_CellsChanged(object sender, CellChangedEvent e)
         {
-            var addCells = e.Cells.Where(c => c.Column.Index == this.InvoiceLinesFirstColumn + 1).ToArray();
+            var addCells = e.Cells
+                .Where(c => c.Column.Index == this.InvoiceLinesFirstColumn + 1
+                           && !this.Controls.ControlByCell.ContainsKey(c)).ToArray();
 
             // When a new detail line is added or deleted.
             if (addCells.Length > 0)
@@ -54,38 +56,23 @@ namespace Application.Sheets
                 // Cell with an detail invoice Line
                 foreach(ICell cell in addCells)
                 {
-                    // Add
-                    if(!string.IsNullOrEmpty(cell.ValueAsString) && !this.Invoice.InvoiceLines.Any(v => v.Index == cell.Row.Index))
-                    {
-                        var invoiceLine = (InvoiceLine)this.program.Services.Database.Create<InvoiceLine>(typeof(InvoiceLine), cell.Row.Index);                       
-                        this.Invoice.AddInvoiceLine(invoiceLine);
+                    var invoiceLine = (InvoiceLine)this.program.Services.Database.Create<InvoiceLine>(typeof(InvoiceLine), 1 + cell.Row.Index - this.InvoiceLinesRange.Row);
+                    this.Invoice.AddInvoiceLine(invoiceLine);
 
-                        var columnIndex = cell.Column.Index - 1;
-                        this.Controls.Label<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "Index");
-                        this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "Description");
-                        this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "Quantity");
-                        this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "UnitPrice");
-                        this.Controls.Label<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "TaxRate");
+                    var columnIndex = cell.Column.Index - 1;
+                    this.Controls.Label<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "Index");
+                    this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "Description");
+                    this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "Quantity");
+                    this.Controls.TextBox<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "UnitPrice");
+                    this.Controls.Label<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "TaxRate");
 
-                        invoiceLine.Description = cell.ValueAsString;
-                                                
-
-                    }
-
-                    // Delete
-                    if (string.IsNullOrEmpty(cell.ValueAsString))
-                    {
-                        var invoiceLine = this.Invoice.InvoiceLines.FirstOrDefault(v => v.Index == cell.Row.Index);
-                        this.Invoice.RemoveInvoiceLine(invoiceLine);
-
-                        //TODO: cleanup
-                        var controls = this.Controls.ControlByCell.Select(v => Equals(v.Key.Tag, invoiceLine));
-
-                    }
-                }               
+                    invoiceLine.Description = cell.ValueAsString;                 
+                }                               
             }
 
-            await this.Refresh().ConfigureAwait(false);
+            this.Controls.Bind();
+
+            await this.Sheet.Flush().ConfigureAwait(false);
         }        
 
         private async void Sheet_SheetActivated(object sender, string e)

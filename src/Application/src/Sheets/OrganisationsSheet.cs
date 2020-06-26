@@ -47,39 +47,33 @@ namespace Application.Sheets
         private async void Sheet_CellsChanged(object sender, CellChangedEvent e)
         {
             // First columns will trigger an insert new Organisation
-            var addCells = e.Cells.Where(c => c.Column.Index == 0).ToArray();
+            var addCells = e.Cells
+                    .Where(c => c.Column.Index == 0 
+                    && c.Value != null 
+                    && !this.Controls.ControlByCell.ContainsKey(c)).ToArray();
 
             if (addCells.Length > 0)
             {
                 // Cell with an detail invoice Line
                 foreach (ICell cell in addCells)
-                {
-                    // Add
-                    if (!string.IsNullOrEmpty(cell.ValueAsString))
-                    {
-                        var organisation = (Organisation)this.program.Services.Database.Create<Organisation>(typeof(Organisation));
-                        this.Organisations.Add(organisation);
+                {       
+                    var organisation = (Organisation)this.program.Services.Database.Create<Organisation>(typeof(Organisation));
+                    organisation.Name = cell.ValueAsString;
 
-                        var colIndex = 0;
-                        this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Name");
-                        this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Street");
-                        this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "City");
-                        this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Country");
-                        this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "VatNumber");
-                        this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Email");
-                        this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Phone");
-                        this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "FinancialContact");
+                    this.Organisations.Add(organisation);
 
-                        organisation.Name = cell.ValueAsString;
+                    var colIndex = 0;
+                    var icell = this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Name");
+                    icell.Style = Constants.ChangedStyle;
 
+                    this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Street");
+                    this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "City");
+                    this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Country");
+                    this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "VatNumber");
+                    this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Email");
+                    this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Phone");
+                    this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "FinancialContact");
 
-                    }
-
-                    // Delete
-                    if (string.IsNullOrEmpty(cell.ValueAsString))
-                    {
-                       
-                    }
                 }
 
                 this.Controls.Bind();
