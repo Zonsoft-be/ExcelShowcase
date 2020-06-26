@@ -1,13 +1,14 @@
 ﻿using System;
-using Excel = Microsoft.Office.Interop.Excel;
-using Microsoft.Office.Core;
 using Application;
 using ProductManager.Services;
-using Allors.Excel.Interop;
 using InteropWorkbook = Microsoft.Office.Interop.Excel.Workbook;
 using InteropWorksheet = Microsoft.Office.Interop.Excel.Worksheet;
 using System.Linq;
 using Application.Sheets;
+using Application.Models;
+using Allors.Excel;
+using Microsoft.Office.Core;
+using Allors.Excel.Interop;
 
 namespace ProductManager
 {
@@ -54,7 +55,7 @@ namespace ProductManager
             {
                 iworkbook.TrySetCustomProperty(AppConstants.KeyWorkbook, true);
 
-                foreach (IWorksheet iworkSheet in iworkbook.Worksheets)
+                foreach (Allors.Excel.IWorksheet iworkSheet in iworkbook.Worksheets)
                 {
                     var invoicesSheet = ((Program)this.AddIn.Program).SheetByWorksheet.FirstOrDefault(w => Equals(iworkSheet, w.Key) && w.Value is InvoicesSheet).Value;
 
@@ -73,7 +74,7 @@ namespace ProductManager
             }
         }      
 
-        private async void ThisAddIn_WorkbookOpen(Excel.Workbook Wb)
+        private async void ThisAddIn_WorkbookOpen(InteropWorkbook Wb)
         {
             // this has been marked as a showCase workbook. So threat it as one we know.
             var iWorkbook = this.AddIn.New(Wb);
@@ -83,29 +84,72 @@ namespace ProductManager
             {
                 if (Convert.ToBoolean(result))
                 {
-                    foreach (InteropWorksheet interopWorksheet in Wb.Sheets)
+                    // Check the Custom Properties for existing data, and if so, instantiate those sheets.
+                    object tagId = null;
+                    if(iWorkbook.TryGetCustomProperty(KnownNames.InvoiceTag, ref tagId))
                     {
+                        // We need to have an OrganisationsSheet
+                        var interopWorksheet = this.GetWorkSheet(Wb, iWorkbook, nameof(InvoicesSheet));
+
+                        if (interopWorksheet == null)
+                        {
+                            var iWorksheet = iWorkbook.AddWorksheet(0);
+                            iWorksheet.Name = KnownNames.InvoicesSheetName;
+                            interopWorksheet = Wb.ActiveSheet;
+
+                        }
+
                         var worksheet = new Allors.Excel.Interop.Worksheet(iWorkbook, interopWorksheet);
+                        var invoicesSheet = new InvoicesSheet(this.AddIn.Program, worksheet);
 
-                        var customProperties = worksheet.GetCustomProperties();
-                        if (customProperties.Any(v =>Equals(AppConstants.KeySheet, v.Key) &&  Equals(nameof(InvoicesSheet), v.Value)))
+                        await invoicesSheet.Load(iWorkbook);
+
+                        ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, invoicesSheet);                       
+                    }
+
+                    if (iWorkbook.TryGetCustomProperty(KnownNames.OrganisationTag, ref tagId))
+                    {
+                        // We need to have an InvoicesSheet
+                        var interopWorksheet = this.GetWorkSheet(Wb, iWorkbook, nameof(OrganisationsSheet));
+                        if (interopWorksheet == null)
                         {
-                            var invoicesSheet = new InvoicesSheet(this.AddIn.Program, worksheet);
-
-                            await invoicesSheet.Load(iWorkbook);
-
-                            ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, invoicesSheet);
+                            var iWorksheet = iWorkbook.AddWorksheet(0);
+                            iWorksheet.Name = KnownNames.OrganisationsSheetName;
+                            interopWorksheet = Wb.ActiveSheet;
                         }
 
-                        if (customProperties.Any(v => Equals(AppConstants.KeySheet, v.Key) && Equals(nameof(OrganisationsSheet), v.Value)))
-                        {
-                            var organisationsSheet = new OrganisationsSheet(this.AddIn.Program, worksheet);
+                        var worksheet = new Allors.Excel.Interop.Worksheet(iWorkbook, interopWorksheet);
+                        var organisationsSheet = new OrganisationsSheet(this.AddIn.Program, worksheet);
 
-                            await organisationsSheet.Load(iWorkbook);
+                        await organisationsSheet.Load(iWorkbook);
 
-                            ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, organisationsSheet);
-                        }
-                    }                    
+                        ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, organisationsSheet);
+
+                    }
+
+                    //foreach (InteropWorksheet interopWorksheet in Wb.Sheets)
+                    //{
+                    //    var worksheet = new Allors.Excel.Interop.Worksheet(iWorkbook, interopWorksheet);
+
+                    //    var customProperties = worksheet.GetCustomProperties();
+                    //    if (customProperties.Any(v =>Equals(AppConstants.KeySheet, v.Key) &&  Equals(nameof(InvoicesSheet), v.Value)))
+                    //    {
+                    //        var invoicesSheet = new InvoicesSheet(this.AddIn.Program, worksheet);
+
+                    //        await invoicesSheet.Load(iWorkbook);
+
+                    //        ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, invoicesSheet);
+                    //    }
+
+                    //    if (customProperties.Any(v => Equals(AppConstants.KeySheet, v.Key) && Equals(nameof(OrganisationsSheet), v.Value)))
+                    //    {
+                    //        var organisationsSheet = new OrganisationsSheet(this.AddIn.Program, worksheet);
+
+                    //        await organisationsSheet.Load(iWorkbook);
+
+                    //        ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, organisationsSheet);
+                    //    }
+                    //}                    
                 }
             }
             else
@@ -114,12 +158,28 @@ namespace ProductManager
             }
         }
 
+        private InteropWorksheet GetWorkSheet(InteropWorkbook workBook, Workbook workbook, string nameOfsheet)
+        {
+            foreach (InteropWorksheet interopWorksheet in workBook.Sheets)
+            {
+                var ws = new Allors.Excel.Interop.Worksheet(workbook, interopWorksheet);
+
+                var customProperties = ws.GetCustomProperties();
+                if (customProperties.Any(v => Equals(AppConstants.KeySheet, v.Key) && Equals(nameOfsheet, v.Value)))
+                {
+                    return interopWorksheet;
+                }            
+            }
+
+            return null;
+        }
+
         private void ThisAddIn_SheetActivate(object Sh)
         {
             this.Ribbon.Invalidate();
         }
 
-        private void ThisAddIn_NewWorkbook(Excel.Workbook Wb)
+        private void ThisAddIn_NewWorkbook(InteropWorkbook Wb)
         {
             // Do stuff when a new workbook is added.
         }

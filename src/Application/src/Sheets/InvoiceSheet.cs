@@ -173,13 +173,19 @@ namespace Application.Sheets
             {
                 if(this.program.Services.MessageService.Confirm($"{file.Name} already exist. Do you want to overwrite this file?"))
                 {
-                    this.Sheet.SaveAsPDF(file, overwriteExistingFile: true, false, ignorePrintAreas: false);
+                    this.SaveAsPDF(file, true);
                 }
             }
             else
             {
-                this.Sheet.SaveAsPDF(file, false, false, ignorePrintAreas: false);
+                this.SaveAsPDF(file, overwrite: false) ;
             }
+        }
+
+        private void SaveAsPDF(FileInfo file, bool overwrite)
+        {
+            this.Sheet.SaveAsPDF(file, overwriteExistingFile: overwrite, openAfterPublish: false, ignorePrintAreas: false);
+            this.program.Services.MessageService.Show($"File as been saved at: {file.FullName}");
         }
 
         internal async Task Save()

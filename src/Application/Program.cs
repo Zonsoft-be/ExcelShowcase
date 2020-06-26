@@ -62,7 +62,7 @@ namespace Application
                 }               
             }
 
-            if (controlId == "PrintInvoiceSheet")
+            if (controlId == "SaveAsPDFInvoiceSheet")
             {
                 if (this.ActiveWorksheet == null)
                 {
@@ -104,12 +104,6 @@ namespace Application
         {
             switch (handle)
             {
-                case "MarkAsShowCaseWorkbook":
-
-                    this.ActiveWorkbook.TrySetCustomProperty(AppConstants.KeyWorkbook, true);
-                    
-                    break;
-
                 case "AddProductSheet":
                     {
                         var kvp = this.SheetByWorksheet.FirstOrDefault(v => Equals(v.Key.Workbook, this.ActiveWorkbook) && v.Value is ProductSheet);
@@ -267,13 +261,15 @@ namespace Application
                         }
                     }
                     break;
-                case "PrintInvoiceSheet":
+                case "SaveAsPDFInvoiceSheet":
                     {
                         if (this.SheetByWorksheet.TryGetValue(this.ActiveWorksheet, out var iSheet))
                         {
                             if (iSheet is InvoiceSheet invoiceSheet)
                             {
                                 invoiceSheet.SaveAsPDF();
+
+
                             }
                         }
                     }

@@ -10,7 +10,6 @@ namespace Application.Models
 {
     public class Invoice : Identifiable
     {
-        public const string TagId = "{78B7A83F-F9E2-4336-83BB-14C51B9EF709}";
 
         public Invoice()
         {

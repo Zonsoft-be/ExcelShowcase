@@ -150,7 +150,7 @@ namespace Application.Sheets
         {
             object tagId = null;
 
-            if( iWorkbook.TryGetCustomProperty(Organisation.TagId, ref tagId))
+            if( iWorkbook.TryGetCustomProperty(KnownNames.OrganisationTag, ref tagId))
             {
                 var xmlDocument = iWorkbook.GetCustomXMLById(Convert.ToString(tagId));
                 if(xmlDocument != null)
@@ -198,7 +198,7 @@ namespace Application.Sheets
             }
 
             // Check if there is already an xml part present for invoices
-            if (iWorkbook.TryGetCustomProperty(Organisation.TagId, ref tagId))
+            if (iWorkbook.TryGetCustomProperty(KnownNames.OrganisationTag, ref tagId))
             {
                 // Delete the existing xml part
                 iWorkbook.TryDeleteCustomXMLById(Convert.ToString(tagId));               
@@ -210,7 +210,7 @@ namespace Application.Sheets
 
             tagId = iWorkbook.SetCustomXML(xmlDoc);
 
-            iWorkbook.TrySetCustomProperty(Organisation.TagId, Convert.ToString(tagId));            
+            iWorkbook.TrySetCustomProperty(KnownNames.OrganisationTag, Convert.ToString(tagId));            
         }
     }
 }
