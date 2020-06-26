@@ -2,12 +2,7 @@
 <customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load">
   <ribbon>
     <tabs>
-      <tab id="tabExcelShowCase" label="Showcase">
-        <group id="MainMenu" label="Menu">
-          <button id="MarkAsShowCaseWorkbook" onAction="OnClick"  label="Mark as Showcase (remember me)" imageMso=" Lock" size="large" getEnabled="GetEnabled"/>
-          <button id="AddProductSheet" onAction="OnClick"  label="Add Product Sheet" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>
-          <button id="ListCovid19Sheet" onAction="OnClick"  label="Covid 19" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>
-        </group>
+      <tab id="tabZonFinanciels" label="ZonFinanciels">
         <group id="OrganisationId" label="Organisations">
           <button id="OrganisationsSheet" onAction="OnClick" label="Organisations" imageMso="TableInsert" size="large" getEnabled="GetEnabled"/>
           <button id="SaveOrganisationsSheet" onAction="OnClick" label="Save" imageMso="FileSave" size="large"  getEnabled="GetEnabled"/>          
@@ -19,6 +14,8 @@
           <button id="PrintInvoiceSheet" onAction="OnClick" label="Print" imageMso="FilePrint" size="large"  getEnabled="GetEnabled"/>
         </group>
         <group id="Demos" label="Demos">
+            <button id="AddProductSheet" onAction="OnClick"  label="Add Product Sheet" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>
+          <button id="ListCovid19Sheet" onAction="OnClick"  label="Covid 19" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>
           <button id="AddDemoSheet" onAction="OnClick"  label="Add Demo Sheet" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>
           <button id="InsertPicture" onAction="OnClick"  label="Insert Image" imageMso="PictureInsertFromFile" size="large" getEnabled="GetEnabled"/>
         </group>
