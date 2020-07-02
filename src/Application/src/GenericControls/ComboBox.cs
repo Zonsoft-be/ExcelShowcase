@@ -3,13 +3,14 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace Application.Ui
+namespace Application.Ui.GenericControls
 {
     using System;
     using Allors.Excel;
     using System.Globalization;
     using Application.Models;
     using System.Reflection;
+    using Application.Ui;
 
     public class ComboBox<T> : IControl where T : Identifiable
     {

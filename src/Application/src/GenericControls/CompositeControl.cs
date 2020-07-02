@@ -1,4 +1,4 @@
-﻿namespace Application.Ui
+﻿namespace Application.Ui.GenericControls
 {
     using System;
     using System.Collections.Generic;

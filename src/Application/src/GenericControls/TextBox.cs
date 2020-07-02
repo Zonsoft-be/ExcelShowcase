@@ -1,4 +1,4 @@
-﻿namespace Application.Ui
+﻿namespace Application.Ui.GenericControls
 {
     using System;
     using Allors.Excel;
@@ -6,7 +6,8 @@
     using Application.Models;
     using System.Reflection;
     using System.Net.Http.Headers;
-    
+    using Application.Ui;
+
     public class TextBox<T> : IControl where T : Identifiable
     {
         /// <summary>
@@ -18,7 +19,7 @@
             this.Cell = cell;
         }
 
-        public T SessionObject { get; internal set; }
+        public T SessionObject { get; set; }
 
         public string RoleType { get; internal set; }
 

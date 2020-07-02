@@ -28,11 +28,11 @@ namespace Application.Data
 
         public void Init()
         {
-            var products = new List<Product>();
+            var products = new Product[100000];
            
             var randomQty = new Random(124578);
 
-            foreach (var index in Enumerable.Range(1, 10000))
+            for(int index = 0; index < products.Length; index++)
             {
                 var product = (Product)this.Create<Product>(null);
 
@@ -46,10 +46,35 @@ namespace Application.Data
                 product.UnitPrice = price;
                 product.Quantity = qty;
 
-                products.Add(product);
+                products[index] = product;
             }
+          
 
-            this.Store<Product>(products.ToArray());           
+            this.Store<Product>(products);
+
+            var organisations = new Organisation[2]
+            {
+                  new Organisation()
+                    {
+                        Name = "Zonsoft.be",
+                        Street = "Uikhoverstraat 158",
+                        City = "BE 3631 Maasmechelen",
+                        Country = "Belgium",
+                        VatNumber = "BE 0880.592.625",
+                        FinancialContact = "Walter Hesius"
+                    },
+                    new Organisation()
+                    {
+                        Name = "Dipu",
+                        Street = "Kleine NieuweDijkstraat 2",
+                        City = "BE 2600 Mechelen",
+                        Country = "Belgium",
+                        VatNumber = "BE 0880.592.625",
+                        FinancialContact = "Koen van Exem"
+                    },
+            };
+
+            this.Store<Organisation>(organisations);
         }
 
         /// <inheritdoc/>       
@@ -130,7 +155,9 @@ namespace Application.Data
         {
             if (ObjectsByType.ContainsKey(typeof(T).Name))
             {             
-                return ((T[])ObjectsByType[typeof(T).Name]).FirstOrDefault<T>(func);
+                return ObjectsByType[typeof(T).Name]
+                    .Cast<T>()
+                    .FirstOrDefault(func);
             }
             else
             {

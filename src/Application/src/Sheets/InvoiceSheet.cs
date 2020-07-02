@@ -1,6 +1,7 @@
 ﻿using Allors.Excel;
 using Application.Models;
 using Application.Ui;
+using Application.Ui.GenericControls;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -67,13 +68,14 @@ namespace Application.Sheets
                     this.Controls.Label<InvoiceLine>(cell.Row.Index, columnIndex++, invoiceLine, "TaxRate");
 
                     invoiceLine.Description = cell.ValueAsString;                 
-                }                               
-            }
+                }
 
-            this.Controls.Bind();
+                this.Controls.Bind();
+            }           
 
             await this.Sheet.Flush().ConfigureAwait(false);
-        }        
+
+        }
 
         private async void Sheet_SheetActivated(object sender, string e)
         {
@@ -101,7 +103,9 @@ namespace Application.Sheets
         private Invoice Invoice {get; set;}
 
         public Range[] NamedRanges { get; }
+
         public bool IsWorksheetUpToDate { get; set; }
+        public Range CustomerSelectRange { get; private set; }
 
         public async Task Refresh()
         {
@@ -112,11 +116,11 @@ namespace Application.Sheets
                 this.Invoice.DeriveDueDate(Convert.ToInt32(this.program.Services.Configuration["InvoiceDueDate"]), this.program.Services.Configuration["InvoiceDueDateScheme"]);                
             }
 
-            var customerSelectRange = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Customer_Name".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
+            this.CustomerSelectRange = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Customer_Name".Equals(r.Name, StringComparison.OrdinalIgnoreCase));
 
             var options = new Range(0, 0, null, null, null, KnownNames.ValidationRangeOrganisations);
 
-            this.Controls.Select<Invoice>(customerSelectRange.Row, customerSelectRange.Column, options, this.Invoice, "Customer", "Name", 
+            this.Controls.Select<Invoice>(this.CustomerSelectRange.Row, this.CustomerSelectRange.Column, options, this.Invoice, "Customer", "Name", 
                 toDomain: (object key) =>
                 {
                     return this.program.Services.Database.FirstOrDefault<Organisation>(o => string.Equals(o.Name, key));

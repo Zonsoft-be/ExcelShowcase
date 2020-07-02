@@ -3,12 +3,13 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace Application.Ui
+namespace Application.Ui.GenericControls
 {
     using System;
     using System.Reflection;
     using Allors.Excel;
     using Application.Models;
+    using Application.Ui;
 
     public class Label<T> : IControl where T : Identifiable
     {
@@ -17,7 +18,7 @@ namespace Application.Ui
             this.Cell = cell;
         }
 
-        public T SessionObject { get; internal set; }
+        public T SessionObject { get; set; }
 
         public string RoleType { get; internal set; }
 

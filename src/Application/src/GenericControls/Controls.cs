@@ -3,7 +3,7 @@
 // Licensed under the LGPL license. See LICENSE file in the project root for full license information.
 // </copyright>
 
-namespace Application.Ui
+namespace Application.Ui.GenericControls
 {
     using System;
     using System.Collections.Concurrent;
