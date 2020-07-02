@@ -3,7 +3,7 @@ using Application.Models;
 using Application.Services;
 using Application.Sheets;
 using Application.Ui;
-using ProductManager.Services;
+using Application.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -290,6 +290,32 @@ namespace Application
                         await organisationsSheet.Refresh().ConfigureAwait(false);
 
                         organisationsSheet.Sheet.IsActive = true;
+                    }
+
+                    break;
+
+                case "PaymentTermsSheet":
+                    {
+                        var kvp = this.SheetByWorksheet.FirstOrDefault(v => Equals(v.Key.Workbook, this.ActiveWorkbook) && v.Value is PaymentTermsSheet);
+
+                        PaymentTermsSheet paymentTermsSheet;
+
+                        if (kvp.Value == null)
+                        {
+                            var iWorksheet = this.ActiveWorkbook.AddWorksheet(0);
+                            iWorksheet.Name = KnownNames.PaymentTermsSheetName;
+                            paymentTermsSheet = new PaymentTermsSheet(this, iWorksheet);
+
+                            this.SheetByWorksheet.Add(iWorksheet, paymentTermsSheet);
+                        }
+                        else
+                        {
+                            paymentTermsSheet = (PaymentTermsSheet)this.SheetByWorksheet[kvp.Key];
+                        }
+
+                        await paymentTermsSheet.Refresh().ConfigureAwait(false);
+
+                        paymentTermsSheet.Sheet.IsActive = true;
                     }
 
                     break;

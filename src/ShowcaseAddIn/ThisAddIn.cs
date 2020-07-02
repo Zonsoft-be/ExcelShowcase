@@ -9,6 +9,7 @@ using Application.Models;
 using Allors.Excel;
 using Microsoft.Office.Core;
 using Allors.Excel.Interop;
+using Application.Services;
 
 namespace ProductManager
 {
@@ -57,6 +58,13 @@ namespace ProductManager
 
                 foreach (Worksheet iworkSheet in iworkbook.Worksheets)
                 {
+                    var paymentTermsSheet = ((Program)this.AddIn.Program).SheetByWorksheet.FirstOrDefault(w => Equals(iworkSheet, w.Key) && w.Value is PaymentTermsSheet).Value;
+
+                    if (paymentTermsSheet != null)
+                    {
+                        ((PaymentTermsSheet)paymentTermsSheet).SaveTo(iworkbook);
+                    }
+
                     var invoicesSheet = ((Program)this.AddIn.Program).SheetByWorksheet.FirstOrDefault(w => Equals(iworkSheet, w.Key) && w.Value is InvoicesSheet).Value;
 
                     if (invoicesSheet != null)
@@ -70,6 +78,7 @@ namespace ProductManager
                     {
                         ((OrganisationsSheet)organisationsSheet).SaveTo(iworkbook);
                     }
+                  
                 }
             }
         }      
@@ -86,6 +95,26 @@ namespace ProductManager
                 {
                     // Check the Custom Properties for existing data, and if so, instantiate those sheets.
                     object tagId = null;
+
+                    if (iWorkbook.TryGetCustomProperty(KnownNames.PaymentTermTag, ref tagId))
+                    {
+                        // We need to have an InvoicesSheet
+                        var interopWorksheet = this.GetWorkSheet(Wb, iWorkbook, nameof(PaymentTermsSheet));
+                        if (interopWorksheet == null)
+                        {
+                            var iWorksheet = iWorkbook.AddWorksheet(0);
+                            iWorksheet.Name = KnownNames.PaymentTermsSheetName;
+                            interopWorksheet = Wb.ActiveSheet;
+                        }
+
+                        var worksheet = new Allors.Excel.Interop.Worksheet(iWorkbook, interopWorksheet);
+                        var paymentTermsSheet = new PaymentTermsSheet(this.AddIn.Program, worksheet);
+
+                        await paymentTermsSheet.Load(iWorkbook);
+
+                        ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, paymentTermsSheet);
+                    }
+
                     if(iWorkbook.TryGetCustomProperty(KnownNames.InvoiceTag, ref tagId))
                     {
                         // We need to have an OrganisationsSheet
@@ -124,32 +153,7 @@ namespace ProductManager
                         await organisationsSheet.Load(iWorkbook);
 
                         ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, organisationsSheet);
-
                     }
-
-                    //foreach (InteropWorksheet interopWorksheet in Wb.Sheets)
-                    //{
-                    //    var worksheet = new Allors.Excel.Interop.Worksheet(iWorkbook, interopWorksheet);
-
-                    //    var customProperties = worksheet.GetCustomProperties();
-                    //    if (customProperties.Any(v =>Equals(AppConstants.KeySheet, v.Key) &&  Equals(nameof(InvoicesSheet), v.Value)))
-                    //    {
-                    //        var invoicesSheet = new InvoicesSheet(this.AddIn.Program, worksheet);
-
-                    //        await invoicesSheet.Load(iWorkbook);
-
-                    //        ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, invoicesSheet);
-                    //    }
-
-                    //    if (customProperties.Any(v => Equals(AppConstants.KeySheet, v.Key) && Equals(nameof(OrganisationsSheet), v.Value)))
-                    //    {
-                    //        var organisationsSheet = new OrganisationsSheet(this.AddIn.Program, worksheet);
-
-                    //        await organisationsSheet.Load(iWorkbook);
-
-                    //        ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, organisationsSheet);
-                    //    }
-                    //}                    
                 }
             }
             else

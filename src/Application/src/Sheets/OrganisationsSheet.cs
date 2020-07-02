@@ -2,7 +2,7 @@
 using Application.Models;
 using Application.Ui;
 using Application.Ui.GenericControls;
-using ProductManager.Services;
+using Application.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -42,7 +42,7 @@ namespace Application.Sheets
             customProperties.Add(AppConstants.KeySheet, nameof(OrganisationsSheet));
             customProperties.Add(AppConstants.KeyCreated, DateTime.Now);
             customProperties.Add(AppConstants.KeyCreatedBy, this.program.Services.Configuration["Username"]);
-            this.Sheet.SetCustomProperties(customProperties);
+            this.Sheet.SetCustomProperties(customProperties);         
         }
 
         private async void Sheet_CellsChanged(object sender, CellChangedEvent e)
@@ -55,6 +55,8 @@ namespace Application.Sheets
 
             if (addCells.Length > 0)
             {
+                var options = new Range(0, 0, null, null, null, KnownNames.ValidationRangePaymentTerms);
+
                 // Cell with an detail invoice Line
                 foreach (ICell cell in addCells)
                 {       
@@ -74,6 +76,12 @@ namespace Application.Sheets
                     this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Email");
                     this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "Phone");
                     this.Controls.TextBox(cell.Row.Index, colIndex++, organisation, "FinancialContact");
+
+                    this.Controls.Select<Organisation>(cell.Row.Index, colIndex++, options, organisation, nameof(organisation.DefaultPaymentTerm), nameof(PaymentTerm.Name),
+                      toDomain: (object key) =>
+                      {
+                          return this.program.Services.Database.FirstOrDefault<PaymentTerm>(o => string.Equals(o.Name, key));
+                      });
 
                 }
 
@@ -125,10 +133,15 @@ namespace Application.Sheets
             this.Controls.Static(0, colIndex++, "Email");
             this.Controls.Static(0, colIndex++, "Phone");
             this.Controls.Static(0, colIndex++, "FinancialContact");
+            this.Controls.Static(0, colIndex++, "Payment Term");
 
             this.Sheet.FreezePanes(new Range(0, -1, 0, 0));
 
             var rowIndex = 1;
+            
+            var options = new Range(0, 0, null, null, null, KnownNames.ValidationRangePaymentTerms);
+
+          
 
             foreach (var organisation in this.Organisations.OrderBy(o => o.Name))
             {
@@ -142,6 +155,13 @@ namespace Application.Sheets
                 this.Controls.TextBox(rowIndex, colIndex++, organisation, "Email");
                 this.Controls.TextBox(rowIndex, colIndex++, organisation, "Phone");
                 this.Controls.TextBox(rowIndex, colIndex++, organisation, "FinancialContact");
+
+                this.Controls.Select<Organisation>(rowIndex, colIndex, options, organisation, nameof(organisation.DefaultPaymentTerm), nameof(PaymentTerm.Description),
+               toDomain: (object key) =>
+               {
+                   return this.program.Services.Database.FirstOrDefault<PaymentTerm>(o => string.Equals(o.Description, key));
+               });
+
 
                 rowIndex++;
             }

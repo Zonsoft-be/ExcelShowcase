@@ -25,5 +25,7 @@ namespace Application.Data
         int Count<T>() where T : Identifiable;
 
         void Save<T>(T instance) where T : Identifiable;
+
+        void Save<T>(T[] instances) where T : Identifiable;        
     }
 }

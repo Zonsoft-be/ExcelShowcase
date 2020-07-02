@@ -26,5 +26,7 @@ namespace Application.Models
         public string Phone { get; set; }
 
         public string FinancialContact { get; set; }
+
+        public PaymentTerm DefaultPaymentTerm { get; set; }
     }
 }

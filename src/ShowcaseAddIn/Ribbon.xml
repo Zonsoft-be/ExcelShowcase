@@ -13,6 +13,9 @@
           <button id="SaveInvoiceSheet" onAction="OnClick" label="Save" imageMso="FileSave" size="large"  getEnabled="GetEnabled"/>
           <button id="SaveAsPDFInvoiceSheet" onAction="OnClick" label="Save as PDF" imageMso="PublishToPdfOrEdoc" size="large"  getEnabled="GetEnabled"/>
         </group>
+         <group id="ConfigurationId" label="Configuration">
+          <button id="PaymentTermsSheet" onAction="OnClick" label="Payment Terms" imageMso="ControlProperties" size="large" getEnabled="GetEnabled"/>         
+        </group>
         <group id="Demos" label="Demos">
             <button id="AddProductSheet" onAction="OnClick"  label="Add Product Sheet" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>
           <button id="ListCovid19Sheet" onAction="OnClick"  label="Covid 19" imageMso="ViewGridlinesWord" size="large" getEnabled="GetEnabled"/>

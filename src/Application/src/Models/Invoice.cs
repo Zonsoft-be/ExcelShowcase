@@ -73,27 +73,11 @@ namespace Application.Models
             this.Tax = this.InvoiceLines.Sum(l => l.Tax);
             this.Total = this.InvoiceLines.Sum(l => l.Total);
 
+            this.InvoiceDueDate = this.Customer.DefaultPaymentTerm.Derive(this.InvoiceDate);
+
             base.OnSave(database);
 
             // Do stuff
-        }
-
-        internal DateTime DeriveDueDate(int days, string scheme)
-        {
-            if(this.InvoiceDate != null)
-            {
-                if ("INV".Equals(scheme))
-                {
-                    this.InvoiceDueDate = this.InvoiceDate.AddDays(days);
-                }
-
-                if ("EOM".Equals(scheme))
-                {
-                    this.InvoiceDueDate = this.InvoiceDate.Date.AddMonths(1).AddDays(days);
-                }
-            }
-
-            return this.InvoiceDueDate;
-        }
+        }           
     }
 }
