@@ -73,7 +73,10 @@ namespace Application.Models
             this.Tax = this.InvoiceLines.Sum(l => l.Tax);
             this.Total = this.InvoiceLines.Sum(l => l.Total);
 
-            this.InvoiceDueDate = this.Customer.DefaultPaymentTerm.Derive(this.InvoiceDate);
+            if (this.Customer?.DefaultPaymentTerm != null)
+            {
+                this.InvoiceDueDate = this.Customer.DefaultPaymentTerm.Derive(this.InvoiceDate);
+            }
 
             base.OnSave(database);
 

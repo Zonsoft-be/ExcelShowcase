@@ -69,10 +69,10 @@ namespace ProductManager
 
                     var template = this.AddIn.Application.Workbooks.Open(templateFile.FullName);
                     var invoiceTemplate = (Microsoft.Office.Interop.Excel.Worksheet)template.Worksheets[1];
-                    invoiceTemplate.Copy(After: targetWorkbook.Sheets[index]);
+                    invoiceTemplate.Copy(After: targetWorkbook.ActiveSheet);
                     template.Close(SaveChanges: false);
 
-                    var copied = (Microsoft.Office.Interop.Excel.Worksheet)targetWorkbook.Sheets[index + 1];                                       
+                    var copied = (Microsoft.Office.Interop.Excel.Worksheet)targetWorkbook.Sheets[targetWorkbook.ActiveSheet.Index];                                       
                     
                     var wb = this.AddIn.WorkbookByInteropWorkbook[targetWorkbook];
                     wb.New(copied);

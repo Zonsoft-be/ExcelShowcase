@@ -39,7 +39,7 @@ namespace Application.Sheets
 
             this.Sheet.SheetActivated += this.Sheet_SheetActivated;
 
-            this.Sheet.Name = $"{nameof(PaymentTermsSheet)}.{this.Sheet.Index}"; // Single Quotes to always allow spaces or special chars
+            this.Sheet.Name = $"{nameof(PaymentTermsSheet)}.{this.Sheet.Index}";
 
             // Fetch after we changed the name.
             this.NamedRanges = this.Sheet.GetNamedRanges();
@@ -116,7 +116,7 @@ namespace Application.Sheets
                 rowIndex++;
             }
 
-            this.Sheet.Workbook.SetNamedRange(KnownNames.ValidationRangePaymentTerms, new Range(1, 2, this.PaymentTerms.Count, 1, this.Sheet));
+            this.Sheet.Workbook.SetNamedRange(KnownNames.ValidationRangePaymentTerms, new Range(1, 3, this.PaymentTerms.Count, 1, this.Sheet));
 
             this.Controls.Bind();
 

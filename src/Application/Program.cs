@@ -2,8 +2,6 @@
 using Application.Models;
 using Application.Services;
 using Application.Sheets;
-using Application.Ui;
-using Application.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -331,7 +329,8 @@ namespace Application
 
             if (kvp.Value == null)
             {
-                var iWorksheet = this.ActiveWorkbook.AddWorksheet(0);
+                // Add at the end
+                var iWorksheet = this.ActiveWorkbook.AddWorksheet(int.MaxValue);
                 iWorksheet.Name = KnownNames.AppConfigSheetName;
                 appConfigSheet = new AppConfigSheet(this, iWorksheet);
 
@@ -343,8 +342,6 @@ namespace Application
             }
 
             await appConfigSheet.Refresh().ConfigureAwait(false);
-
-            appConfigSheet.Sheet.IsVisible = false;
         }
 
         public async Task OnLogin()

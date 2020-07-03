@@ -97,24 +97,21 @@ namespace ProductManager
                     object tagId = null;
 
                     {
-                        // We need to have an InvoicesSheet
-                        var interopWorksheet = this.GetWorkSheet(Wb, iWorkbook, nameof(AppConfigSheet));
-                        if (interopWorksheet == null)
-                        {
-                            var iWorksheet = iWorkbook.AddWorksheet(0);
-                            iWorksheet.Name = KnownNames.AppConfigSheetName;
-                            interopWorksheet = Wb.ActiveSheet;
-                        }
+                        //// We need to have an InvoicesSheet
+                        //var interopWorksheet = this.GetWorkSheet(Wb, iWorkbook, nameof(AppConfigSheet));
+                        //if (interopWorksheet == null)
+                        //{
+                        //    var iWorksheet = iWorkbook.AddWorksheet(0);
+                        //    iWorksheet.Name = KnownNames.AppConfigSheetName;
+                        //    interopWorksheet = Wb.ActiveSheet;
+                        //}
 
-                        var worksheet = new Allors.Excel.Interop.Worksheet(iWorkbook, interopWorksheet);
-                        var appConfigSheet = new AppConfigSheet(this.AddIn.Program, worksheet);
+                        //var worksheet = new Allors.Excel.Interop.Worksheet(iWorkbook, interopWorksheet);
+                        //var appConfigSheet = new AppConfigSheet(this.AddIn.Program, worksheet);
 
-                        await appConfigSheet.Refresh();
+                        //await appConfigSheet.Refresh();
 
-                        ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, appConfigSheet);
-
-                        // Hide this sheet.
-                        worksheet.IsVisible = false;
+                        //((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, appConfigSheet);                      
                     }
 
                     if (iWorkbook.TryGetCustomProperty(KnownNames.PaymentTermTag, ref tagId))

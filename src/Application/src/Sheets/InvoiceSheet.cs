@@ -36,7 +36,7 @@ namespace Application.Sheets
             this.Sheet.SheetActivated += this.Sheet_SheetActivated;
             this.Sheet.CellsChanged += Sheet_CellsChanged;
 
-            this.Sheet.Name = $"{nameof(InvoiceSheet)}.{this.Sheet.Index}"; // Single Quotes to always allow spaces or special chars
+            this.Sheet.Name = $"{nameof(InvoiceSheet)}.{this.Sheet.Index}";
 
             // Fetch after we changed the name.
             this.NamedRanges = this.Sheet.GetNamedRanges();
@@ -112,7 +112,7 @@ namespace Application.Sheets
             if(this.Invoice == null)
             {
                 this.Invoice = (Invoice)this.program.Services.Database.Create<Invoice>(null);
-                this.Invoice.InvoiceDate = DateTime.Now;                
+                this.Invoice.InvoiceDate = DateTime.Now;                    
             }
 
             this.CustomerSelectRange = this.NamedRanges.FirstOrDefault(r => $"{this.Sheet.Name}!Customer_Name".Equals(r.Name, StringComparison.OrdinalIgnoreCase));

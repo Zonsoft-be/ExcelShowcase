@@ -9,7 +9,7 @@ namespace Application.Models
         public const string InvoicesSheetName = "Invoices";
         public const string OrganisationsSheetName = "Organisations";
         public const string PaymentTermsSheetName = "PaymentTerms";
-        public const string AppConfigSheetName = "App Config";
+        public const string AppConfigSheetName = "AppConfig";
 
         public const string InvoiceTag = "{78B7A83F-F9E2-4336-83BB-14C51B9EF709}";
         public const string OrganisationTag = "{344583ED-FAEC-495E-AE45-FAD59F457AF2}";
