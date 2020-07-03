@@ -54,8 +54,8 @@ namespace Application.Data
 
             var paymentTerms = new PaymentTerm[2]
             {
-                    new PaymentTerm("INV", 30, "INV30 (Betaling 30 dagen na factuurdatum.)"),
-                    new PaymentTerm("EOM", 30, "EOP30 (Betaling 30 dagen na einde maand factuurdatum.)")
+                    new PaymentTerm("INV", 30, false, "INV30 (Betaling 30 dagen na factuurdatum.)"),
+                    new PaymentTerm("EOM", 30, true, "EOP30 (Betaling 30 dagen na einde maand factuurdatum.)")
             };
 
             this.Store<PaymentTerm>(paymentTerms);
@@ -94,6 +94,8 @@ namespace Application.Data
             };
 
             this.Store<Organisation>(organisations);
+
+
         }
 
         /// <inheritdoc/>       

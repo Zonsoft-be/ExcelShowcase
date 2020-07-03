@@ -29,6 +29,7 @@ namespace Application.Sheets
         public PaymentTermsSheet(IProgram program, IWorksheet worksheet)
         {
             this.program = (Program)program;
+
             this.Sheet = worksheet;
 
             this.Controls = new Controls(worksheet);
@@ -81,6 +82,8 @@ namespace Application.Sheets
 
         public async Task Refresh()
         {
+            await this.program.AddAppConfigSheet();
+
             this.PaymentTerms = this.program.Services.Database.Get<PaymentTerm>()?.ToList();
 
             await RefreshSheet().ConfigureAwait(false);
@@ -92,11 +95,14 @@ namespace Application.Sheets
             //
             this.Controls.Static(0, colIndex++, "Name");
             this.Controls.Static(0, colIndex++, "Days");
+            this.Controls.Static(0, colIndex++, "EndOfMonth");
             this.Controls.Static(0, colIndex++, "Description");           
 
             this.Sheet.FreezePanes(new Range(0, -1, 0, 0));
 
             var rowIndex = 1;
+
+            var options = new Range(0, 0, null, null, null, KnownNames.ValidationRangeBooleans);
 
             foreach (var paymentTerm in this.PaymentTerms.OrderBy(o => o.Name))
             {
@@ -104,6 +110,7 @@ namespace Application.Sheets
 
                 this.Controls.TextBox(rowIndex, colIndex++, paymentTerm, "Name");
                 this.Controls.TextBox(rowIndex, colIndex++, paymentTerm, "Days");
+                this.Controls.Select(rowIndex, colIndex++, options, paymentTerm, "EndOfMonth");
                 this.Controls.TextBox(rowIndex, colIndex++, paymentTerm, "Description");              
 
                 rowIndex++;

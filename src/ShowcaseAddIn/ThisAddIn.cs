@@ -96,6 +96,27 @@ namespace ProductManager
                     // Check the Custom Properties for existing data, and if so, instantiate those sheets.
                     object tagId = null;
 
+                    {
+                        // We need to have an InvoicesSheet
+                        var interopWorksheet = this.GetWorkSheet(Wb, iWorkbook, nameof(AppConfigSheet));
+                        if (interopWorksheet == null)
+                        {
+                            var iWorksheet = iWorkbook.AddWorksheet(0);
+                            iWorksheet.Name = KnownNames.AppConfigSheetName;
+                            interopWorksheet = Wb.ActiveSheet;
+                        }
+
+                        var worksheet = new Allors.Excel.Interop.Worksheet(iWorkbook, interopWorksheet);
+                        var appConfigSheet = new AppConfigSheet(this.AddIn.Program, worksheet);
+
+                        await appConfigSheet.Refresh();
+
+                        ((Program)this.AddIn.Program).SheetByWorksheet.Add(worksheet, appConfigSheet);
+
+                        // Hide this sheet.
+                        worksheet.IsVisible = false;
+                    }
+
                     if (iWorkbook.TryGetCustomProperty(KnownNames.PaymentTermTag, ref tagId))
                     {
                         // We need to have an InvoicesSheet

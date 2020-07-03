@@ -323,6 +323,30 @@ namespace Application
             }
         }
 
+        public async Task AddAppConfigSheet()
+        {
+            var kvp = this.SheetByWorksheet.FirstOrDefault(v => Equals(v.Key.Workbook, this.ActiveWorkbook) && v.Value is AppConfigSheet);
+
+            AppConfigSheet appConfigSheet;
+
+            if (kvp.Value == null)
+            {
+                var iWorksheet = this.ActiveWorkbook.AddWorksheet(0);
+                iWorksheet.Name = KnownNames.AppConfigSheetName;
+                appConfigSheet = new AppConfigSheet(this, iWorksheet);
+
+                this.SheetByWorksheet.Add(iWorksheet, appConfigSheet);
+            }
+            else
+            {
+                appConfigSheet = (AppConfigSheet)this.SheetByWorksheet[kvp.Key];
+            }
+
+            await appConfigSheet.Refresh().ConfigureAwait(false);
+
+            appConfigSheet.Sheet.IsVisible = false;
+        }
+
         public async Task OnLogin()
         {
             await Task.CompletedTask;
